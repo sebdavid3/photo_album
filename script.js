@@ -17,7 +17,7 @@ let editingLetterId = null
 // ============================================================
 // SUPABASE CLIENT (para Storage)
 // ============================================================
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // ============================================================
 // HELPERS
@@ -328,7 +328,7 @@ async function handleUpload() {
 
   try {
     // Upload to Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { data: uploadData, error: uploadError } = await sbClient.storage
       .from('photos')
       .upload(fileName, file, {
         cacheControl: '3600',
@@ -340,7 +340,7 @@ async function handleUpload() {
     progressBar.style.width = '70%'
 
     // Get public URL
-    const { data: urlData } = supabase.storage
+    const { data: urlData } = sbClient.storage
       .from('photos')
       .getPublicUrl(fileName)
 
@@ -501,7 +501,7 @@ async function saveLetter() {
       const file = pdfInput.files[0]
       const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { data: uploadData, error: uploadError } = await sbClient.storage
         .from('letters')
         .upload(fileName, file, {
           cacheControl: '3600',
@@ -510,7 +510,7 @@ async function saveLetter() {
 
       if (uploadError) throw uploadError
 
-      const { data: urlData } = supabase.storage
+      const { data: urlData } = sbClient.storage
         .from('letters')
         .getPublicUrl(fileName)
 
