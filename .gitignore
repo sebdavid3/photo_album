@@ -2,5 +2,6 @@ node_modules/
 .env
 config.js
 .DS_Store
+supabase/.temp/
 stardewvalleytheme-main.zip
 stardewvalleytheme-main/

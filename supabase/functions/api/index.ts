@@ -276,6 +276,103 @@ serve(async (req: Request) => {
         break
       }
 
+      // ============================================================
+      // Albums
+      // ============================================================
+      case 'create_album': {
+        if (!body.title) {
+          return new Response(
+            JSON.stringify({ error: 'Falta campo: title' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          )
+        }
+        const { data, error } = await supabase
+          .from('albums')
+          .insert({
+            title: body.title,
+            description: body.description || '',
+          })
+          .select()
+          .single()
+        if (error) throw error
+        result = { album: data }
+        break
+      }
+
+      case 'update_album': {
+        if (!body.id) {
+          return new Response(
+            JSON.stringify({ error: 'Falta campo: id' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          )
+        }
+        const updateData: any = { updated_at: new Date().toISOString() }
+        if (body.title !== undefined) updateData.title = body.title
+        if (body.description !== undefined) updateData.description = body.description
+
+        const { data, error } = await supabase
+          .from('albums')
+          .update(updateData)
+          .eq('id', body.id)
+          .select()
+          .single()
+        if (error) throw error
+        result = { album: data }
+        break
+      }
+
+      case 'delete_album': {
+        if (!body.id) {
+          return new Response(
+            JSON.stringify({ error: 'Falta campo: id' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          )
+        }
+        const { error } = await supabase
+          .from('albums')
+          .delete()
+          .eq('id', body.id)
+        if (error) throw error
+        result = { success: true }
+        break
+      }
+
+      case 'add_photos_to_album': {
+        if (!body.album_id || !body.photo_ids || !Array.isArray(body.photo_ids)) {
+          return new Response(
+            JSON.stringify({ error: 'Faltan campos: album_id, photo_ids (array)' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          )
+        }
+        const rows = body.photo_ids.map((photo_id: string) => ({
+          album_id: body.album_id,
+          photo_id,
+        }))
+        const { error } = await supabase
+          .from('album_photos')
+          .upsert(rows, { onConflict: 'album_id,photo_id' })
+        if (error) throw error
+        result = { success: true }
+        break
+      }
+
+      case 'remove_photo_from_album': {
+        if (!body.album_id || !body.photo_id) {
+          return new Response(
+            JSON.stringify({ error: 'Faltan campos: album_id, photo_id' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          )
+        }
+        const { error } = await supabase
+          .from('album_photos')
+          .delete()
+          .eq('album_id', body.album_id)
+          .eq('photo_id', body.photo_id)
+        if (error) throw error
+        result = { success: true }
+        break
+      }
+
       default: {
         return new Response(
           JSON.stringify({ error: `Acción desconocida: ${action}` }),

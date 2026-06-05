@@ -19,112 +19,129 @@
   <div class="clouds"><img src="assets/clouds.webp" alt="clouds" /></div>
 </div>
 
-<!-- LOGIN OVERLAY -->
-<div id="login-overlay" class="login-overlay">
-  <div class="login-box">
-    <h1 id="album-title-login">Nuestro Album</h1>
-    <p class="subtitle">Un album de recuerdos</p>
-    <div class="input-group">
-      <input type="password" id="password-input" placeholder="Contrasena..." autocomplete="off" />
-    </div>
-    <button id="login-btn" class="sv-btn">Entrar</button>
-    <p id="login-error" class="login-error"></p>
-    <p style="font-size:14px;margin-top:1em;opacity:0.5;">Un lugar solo para nosotros</p>
-  </div>
-</div>
-
 <!-- MAIN MENU -->
-<div id="main-menu" class="menu" style="display: none;">
+<div class="menu" id="main-menu">
 
   <!-- TABS -->
   <div class="menu__tabs__container">
     <button class="btn menu__tab menu__tab--active" data-tooltip="Galeria" onclick="openTab(event,'galeria')">
       <img src="assets/backpack.svg" class="menu__img" alt="galeria" />
     </button>
-    <button class="btn menu__tab" data-tooltip="Subir foto" onclick="openTab(event,'subir')">
-      <img src="assets/avatar.svg" class="menu__img" alt="subir" />
+    <button class="btn menu__tab" data-tooltip="Albumes" onclick="openTab(event,'albumes')">
+      <img src="assets/tool.svg" class="menu__img" alt="albumes" />
     </button>
     <button class="btn menu__tab" data-tooltip="Cartas" onclick="openTab(event,'cartas')">
       <img src="assets/heart.svg" class="menu__img" alt="cartas" />
     </button>
-    <button class="btn menu__tab" data-tooltip="Colecciones" onclick="openTab(event,'colecciones')" style="display: none;">
-      <img src="assets/bag.svg" class="menu__img" alt="colecciones" />
-    </button>
     <button class="btn menu__tab" data-tooltip="Ajustes" onclick="openTab(event,'ajustes')">
       <img src="assets/console.svg" class="menu__img" alt="ajustes" />
-    </button>
-    <button class="btn menu__tab" data-tooltip="Salir" id="exit-btn">
-      <img src="assets/close.svg" class="menu__img" alt="salir" />
     </button>
   </div>
 
   <!-- MAIN CONTENT -->
   <div class="main">
 
-    <!-- ========== GALERIA TAB ========== -->
+    <!-- ========== GALERIA ========== -->
     <div id="galeria" class="content">
       <div class="section-header">
         <h2>Galeria</h2>
-        <button class="sv-btn sv-btn-small" onclick="loadPhotos()">Recargar</button>
+        <div class="section-header-btns">
+          <button class="sv-btn sv-btn-small" id="gallery-upload-btn">Subir foto</button>
+          <button class="sv-btn sv-btn-small" onclick="loadGallery()">Recargar</button>
+        </div>
       </div>
       <div id="gallery-container">
         <div class="loading">Cargando recuerdos...</div>
       </div>
     </div>
 
-    <!-- ========== SUBIR FOTO TAB ========== -->
-    <div id="subir" class="content" style="display: none;">
-      <h2>Subir un Recuerdo</h2>
-      <div class="upload-section">
-        <div class="form-group">
-          <label>Foto</label>
-          <div class="file-input-wrapper">
-            <button type="button" class="sv-btn sv-btn-small">Seleccionar imagen</button>
-            <input type="file" id="photo-file" accept="image/*" />
+    <!-- ========== ALBUMES ========== -->
+    <div id="albumes" class="content" style="display: none;">
+      <!-- Lista de albumes -->
+      <div id="albums-list-view">
+        <div class="section-header">
+          <h2>Albumes</h2>
+          <button class="sv-btn sv-btn-small" id="create-album-btn">Nuevo album</button>
+        </div>
+        <div id="albums-container">
+          <div class="loading">Cargando albumes...</div>
+        </div>
+      </div>
+
+      <!-- Vista dentro de un album -->
+      <div id="album-detail-view" class="hidden">
+        <div class="section-header">
+          <button class="sv-btn sv-btn-small" id="album-back-btn">Volver</button>
+          <h2 id="album-detail-title"></h2>
+          <div class="section-header-btns">
+            <button class="sv-btn sv-btn-small" id="album-add-photos-btn">Agregar fotos</button>
+            <button class="sv-btn sv-btn-small sv-btn-danger" id="album-delete-btn">Borrar album</button>
           </div>
-          <span id="photo-file-name" class="file-name"></span>
         </div>
-        <div id="upload-preview" class="upload-preview hidden">
-          <img id="upload-preview-img" src="" alt="Preview" />
+        <p id="album-detail-desc" style="font-size:18px;opacity:0.7;margin-bottom:1em;"></p>
+        <div id="album-photos-container">
+          <div class="loading">Cargando fotos...</div>
         </div>
-        <div class="form-group">
-          <label for="photo-title">Titulo</label>
-          <input type="text" id="photo-title" class="sv-input" placeholder="Un titulo para este recuerdo..." />
+      </div>
+
+      <!-- Modal: crear album -->
+      <div id="album-form-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+          <button class="modal-close" id="album-form-close">&times;</button>
+          <h3 id="album-form-title">Nuevo Album</h3>
+          <div class="form-group">
+            <label>Titulo</label>
+            <input type="text" id="album-form-name" class="sv-input" placeholder="Nombre del album..." />
+          </div>
+          <div class="form-group">
+            <label>Descripcion</label>
+            <textarea id="album-form-desc" class="sv-textarea" placeholder="Que contiene este album..." style="min-height:80px;"></textarea>
+          </div>
+          <button class="sv-btn" id="album-form-save">Guardar album</button>
+          <p id="album-form-error" class="error-msg"></p>
         </div>
-        <div class="form-group">
-          <label for="photo-desc">Descripcion</label>
-          <textarea id="photo-desc" class="sv-textarea" placeholder="Que paso ese dia..."></textarea>
+      </div>
+
+      <!-- Modal: agregar fotos al album -->
+      <div id="add-photos-modal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width:800px;width:95%;">
+          <button class="modal-close" id="add-photos-close">&times;</button>
+          <h3>Agregar fotos al album</h3>
+          <p style="font-size:16px;opacity:0.7;margin-bottom:0.5em;">Haz clic en las fotos para seleccionarlas</p>
+          <div id="add-photos-grid" class="selectable-grid">
+            <div class="loading">Cargando fotos disponibles...</div>
+          </div>
+          <div style="display:flex;gap:0.5em;margin-top:1em;">
+            <button class="sv-btn" id="add-photos-confirm">Agregar seleccionadas</button>
+            <span id="add-photos-count" style="font-size:18px;align-self:center;opacity:0.6;"></span>
+          </div>
+          <p id="add-photos-error" class="error-msg"></p>
         </div>
-        <div class="upload-progress" id="upload-progress">
-          <div class="bar" id="upload-progress-bar"></div>
-        </div>
-        <button class="sv-btn" id="upload-btn">Guardar recuerdo</button>
-        <p id="upload-error" class="error-msg"></p>
       </div>
     </div>
 
-    <!-- ========== CARTAS TAB ========== -->
+    <!-- ========== CARTAS ========== -->
     <div id="cartas" class="content" style="display: none;">
       <div class="section-header">
         <h2>Cartas</h2>
         <button class="sv-btn sv-btn-small" id="new-letter-btn">Nueva carta</button>
       </div>
 
-      <!-- NEW LETTER FORM -->
+      <!-- New letter form -->
       <div id="letter-form" class="letter-form hidden">
         <h3 id="letter-form-title">Escribir carta</h3>
         <div class="form-group">
-          <label for="letter-title">Titulo</label>
+          <label>Titulo</label>
           <input type="text" id="letter-title" class="sv-input" placeholder="Para ti..." />
         </div>
         <div class="form-group">
-          <label for="letter-content">Carta</label>
+          <label>Carta</label>
           <textarea id="letter-content" class="sv-textarea" placeholder="Escribe tu carta aqui..." style="min-height:180px;"></textarea>
         </div>
         <div class="form-group">
-          <label>Adjuntar PDF (carta a mano / dibujo)</label>
+          <label>Adjuntar (PDF, carta escaneada, dibujo)</label>
           <div class="file-input-wrapper">
-            <button type="button" class="sv-btn sv-btn-small">Seleccionar PDF</button>
+            <button type="button" class="sv-btn sv-btn-small">Seleccionar archivo</button>
             <input type="file" id="letter-pdf-file" accept=".pdf,image/*" />
           </div>
           <span id="letter-pdf-name" class="file-name"></span>
@@ -136,38 +153,90 @@
         <p id="letter-error" class="error-msg"></p>
       </div>
 
-      <!-- LETTERS LIST -->
+      <!-- Letters list -->
       <div id="letters-container">
         <div class="loading">Cargando cartas...</div>
       </div>
     </div>
 
-    <!-- ========== COLECCIONES TAB (oculta, futuro) ========== -->
-    <div id="colecciones" class="content" style="display: none;">
-      <h2>Colecciones</h2>
-      <p class="no-data">Proximamente... organiza tus fotos en colecciones.</p>
-    </div>
-
-    <!-- ========== AJUSTES TAB ========== -->
+    <!-- ========== AJUSTES ========== -->
     <div id="ajustes" class="content" style="display: none;">
       <h2>Ajustes</h2>
-      <div class="settings-section">
+      <div id="settings-logged-out" class="settings-section">
+        <p style="margin-bottom:1em;">Inicia sesion para administrar el album.</p>
         <div class="form-group">
-          <label for="settings-album-name">Nombre del album</label>
+          <label for="settings-password">Contrasena</label>
+          <input type="password" id="settings-password" class="sv-input" placeholder="Contrasena..." />
+        </div>
+        <button class="sv-btn" id="settings-login-btn">Entrar</button>
+        <p id="settings-login-error" class="error-msg"></p>
+      </div>
+
+      <div id="settings-logged-in" class="settings-section hidden">
+        <p style="margin-bottom:1em;color:var(--success);">Autenticado</p>
+        <div class="form-group">
+          <label>Nombre del album</label>
           <input type="text" id="settings-album-name" class="sv-input" />
         </div>
         <div class="form-group">
-          <label for="settings-new-password">Nueva contrasena</label>
-          <input type="password" id="settings-new-password" class="sv-input" placeholder="Dejar vacio para no cambiar..." />
+          <label>Nueva contrasena (dejar vacio para no cambiar)</label>
+          <input type="password" id="settings-new-password" class="sv-input" placeholder="Nueva contrasena..." />
         </div>
         <button class="sv-btn" id="save-settings-btn">Guardar cambios</button>
+        <button class="sv-btn sv-btn-small" id="settings-logout-btn" style="margin-left:0.5em;">Salir</button>
         <p id="settings-msg" class="success-msg"></p>
       </div>
     </div>
 
   </div><!-- end main -->
-
 </div><!-- end menu -->
+
+<!-- LOGIN MODAL (for protected actions) -->
+<div id="login-modal" class="modal-overlay hidden">
+  <div class="modal-content" style="position:relative;max-width:400px;">
+    <button class="modal-close" id="login-modal-close">&times;</button>
+    <h3>Inicia sesion</h3>
+    <p style="font-size:18px;margin-bottom:1em;">Necesitas la contrasena para continuar.</p>
+    <div class="form-group">
+      <input type="password" id="login-modal-password" class="sv-input" placeholder="Contrasena..." />
+    </div>
+    <button class="sv-btn" id="login-modal-btn">Entrar</button>
+    <p id="login-modal-error" class="error-msg"></p>
+  </div>
+</div>
+
+<!-- UPLOAD MODAL -->
+<div id="upload-modal" class="modal-overlay hidden">
+  <div class="modal-content" style="position:relative;max-width:500px;">
+    <button class="modal-close" id="upload-modal-close">&times;</button>
+    <h3>Subir foto</h3>
+    <div class="form-group">
+      <label>Foto</label>
+      <div class="file-input-wrapper">
+        <button type="button" class="sv-btn sv-btn-small">Seleccionar imagen</button>
+        <input type="file" id="upload-photo-file" accept="image/*" />
+      </div>
+      <span id="upload-photo-name" class="file-name"></span>
+    </div>
+    <div id="upload-preview-wrap" class="upload-preview hidden">
+      <img id="upload-preview-img" src="" alt="Preview" />
+    </div>
+    <div class="form-group">
+      <label>Titulo</label>
+      <input type="text" id="upload-photo-title" class="sv-input" placeholder="Un titulo..." />
+    </div>
+    <div class="form-group">
+      <label>Descripcion</label>
+      <textarea id="upload-photo-desc" class="sv-textarea" placeholder="Que paso ese dia..." style="min-height:80px;"></textarea>
+    </div>
+    <div class="upload-progress" id="upload-progress-bar-wrap">
+      <div class="bar" id="upload-progress-bar"></div>
+    </div>
+    <button class="sv-btn" id="upload-modal-submit">Subir foto</button>
+    <p id="upload-modal-error" class="error-msg"></p>
+    <p id="upload-modal-target" style="display:none;"></p>
+  </div>
+</div>
 
 <!-- PHOTO MODAL -->
 <div id="photo-modal" class="modal-overlay hidden">
