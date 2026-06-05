@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nuestro Album</title>
+<link rel="shortcut icon" href="assets/favicon.ico">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- MOVING CLOUDS -->
+<div class="marquee">
+  <div class="clouds"><img src="assets/clouds.webp" alt="clouds" /></div>
+  <div class="clouds"><img src="assets/clouds.webp" alt="clouds" /></div>
+  <div class="clouds"><img src="assets/clouds.webp" alt="clouds" /></div>
+  <div class="clouds"><img src="assets/clouds.webp" alt="clouds" /></div>
+  <div class="clouds"><img src="assets/clouds.webp" alt="clouds" /></div>
+  <div class="clouds"><img src="assets/clouds.webp" alt="clouds" /></div>
+</div>
+
+<!-- LOGIN OVERLAY -->
+<div id="login-overlay" class="login-overlay">
+  <div class="login-box">
+    <h1 id="album-title-login">Nuestro Album</h1>
+    <p class="subtitle">Un album de recuerdos</p>
+    <div class="input-group">
+      <input type="password" id="password-input" placeholder="Contrasena..." autocomplete="off" />
+    </div>
+    <button id="login-btn" class="sv-btn">Entrar</button>
+    <p id="login-error" class="login-error"></p>
+    <p style="font-size:14px;margin-top:1em;opacity:0.5;">Un lugar solo para nosotros</p>
+  </div>
+</div>
+
+<!-- MAIN MENU -->
+<div id="main-menu" class="menu" style="display: none;">
+
+  <!-- TABS -->
+  <div class="menu__tabs__container">
+    <button class="btn menu__tab menu__tab--active" data-tooltip="Galeria" onclick="openTab(event,'galeria')">
+      <img src="assets/backpack.svg" class="menu__img" alt="galeria" />
+    </button>
+    <button class="btn menu__tab" data-tooltip="Subir foto" onclick="openTab(event,'subir')">
+      <img src="assets/avatar.svg" class="menu__img" alt="subir" />
+    </button>
+    <button class="btn menu__tab" data-tooltip="Cartas" onclick="openTab(event,'cartas')">
+      <img src="assets/heart.svg" class="menu__img" alt="cartas" />
+    </button>
+    <button class="btn menu__tab" data-tooltip="Colecciones" onclick="openTab(event,'colecciones')" style="display: none;">
+      <img src="assets/bag.svg" class="menu__img" alt="colecciones" />
+    </button>
+    <button class="btn menu__tab" data-tooltip="Ajustes" onclick="openTab(event,'ajustes')">
+      <img src="assets/console.svg" class="menu__img" alt="ajustes" />
+    </button>
+    <button class="btn menu__tab" data-tooltip="Salir" id="exit-btn">
+      <img src="assets/close.svg" class="menu__img" alt="salir" />
+    </button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- ========== GALERIA TAB ========== -->
+    <div id="galeria" class="content">
+      <div class="section-header">
+        <h2>Galeria</h2>
+        <button class="sv-btn sv-btn-small" onclick="loadPhotos()">Recargar</button>
+      </div>
+      <div id="gallery-container">
+        <div class="loading">Cargando recuerdos...</div>
+      </div>
+    </div>
+
+    <!-- ========== SUBIR FOTO TAB ========== -->
+    <div id="subir" class="content" style="display: none;">
+      <h2>Subir un Recuerdo</h2>
+      <div class="upload-section">
+        <div class="form-group">
+          <label>Foto</label>
+          <div class="file-input-wrapper">
+            <button type="button" class="sv-btn sv-btn-small">Seleccionar imagen</button>
+            <input type="file" id="photo-file" accept="image/*" />
+          </div>
+          <span id="photo-file-name" class="file-name"></span>
+        </div>
+        <div id="upload-preview" class="upload-preview hidden">
+          <img id="upload-preview-img" src="" alt="Preview" />
+        </div>
+        <div class="form-group">
+          <label for="photo-title">Titulo</label>
+          <input type="text" id="photo-title" class="sv-input" placeholder="Un titulo para este recuerdo..." />
+        </div>
+        <div class="form-group">
+          <label for="photo-desc">Descripcion</label>
+          <textarea id="photo-desc" class="sv-textarea" placeholder="Que paso ese dia..."></textarea>
+        </div>
+        <div class="upload-progress" id="upload-progress">
+          <div class="bar" id="upload-progress-bar"></div>
+        </div>
+        <button class="sv-btn" id="upload-btn">Guardar recuerdo</button>
+        <p id="upload-error" class="error-msg"></p>
+      </div>
+    </div>
+
+    <!-- ========== CARTAS TAB ========== -->
+    <div id="cartas" class="content" style="display: none;">
+      <div class="section-header">
+        <h2>Cartas</h2>
+        <button class="sv-btn sv-btn-small" id="new-letter-btn">Nueva carta</button>
+      </div>
+
+      <!-- NEW LETTER FORM -->
+      <div id="letter-form" class="letter-form hidden">
+        <h3 id="letter-form-title">Escribir carta</h3>
+        <div class="form-group">
+          <label for="letter-title">Titulo</label>
+          <input type="text" id="letter-title" class="sv-input" placeholder="Para ti..." />
+        </div>
+        <div class="form-group">
+          <label for="letter-content">Carta</label>
+          <textarea id="letter-content" class="sv-textarea" placeholder="Escribe tu carta aqui..." style="min-height:180px;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Adjuntar PDF (carta a mano / dibujo)</label>
+          <div class="file-input-wrapper">
+            <button type="button" class="sv-btn sv-btn-small">Seleccionar PDF</button>
+            <input type="file" id="letter-pdf-file" accept=".pdf,image/*" />
+          </div>
+          <span id="letter-pdf-name" class="file-name"></span>
+        </div>
+        <div style="display:flex;gap:0.5em;">
+          <button class="sv-btn" id="save-letter-btn">Guardar carta</button>
+          <button class="sv-btn" id="cancel-letter-btn">Cancelar</button>
+        </div>
+        <p id="letter-error" class="error-msg"></p>
+      </div>
+
+      <!-- LETTERS LIST -->
+      <div id="letters-container">
+        <div class="loading">Cargando cartas...</div>
+      </div>
+    </div>
+
+    <!-- ========== COLECCIONES TAB (oculta, futuro) ========== -->
+    <div id="colecciones" class="content" style="display: none;">
+      <h2>Colecciones</h2>
+      <p class="no-data">Proximamente... organiza tus fotos en colecciones.</p>
+    </div>
+
+    <!-- ========== AJUSTES TAB ========== -->
+    <div id="ajustes" class="content" style="display: none;">
+      <h2>Ajustes</h2>
+      <div class="settings-section">
+        <div class="form-group">
+          <label for="settings-album-name">Nombre del album</label>
+          <input type="text" id="settings-album-name" class="sv-input" />
+        </div>
+        <div class="form-group">
+          <label for="settings-new-password">Nueva contrasena</label>
+          <input type="password" id="settings-new-password" class="sv-input" placeholder="Dejar vacio para no cambiar..." />
+        </div>
+        <button class="sv-btn" id="save-settings-btn">Guardar cambios</button>
+        <p id="settings-msg" class="success-msg"></p>
+      </div>
+    </div>
+
+  </div><!-- end main -->
+
+</div><!-- end menu -->
+
+<!-- PHOTO MODAL -->
+<div id="photo-modal" class="modal-overlay hidden">
+  <div class="modal-content" style="position:relative;">
+    <button class="modal-close" id="modal-close">&times;</button>
+    <img id="modal-img" src="" alt="" />
+    <h2 id="modal-title"></h2>
+    <p id="modal-desc"></p>
+    <p id="modal-date" style="font-size:14px;opacity:0.6;"></p>
+    <div class="modal-actions">
+      <button class="sv-btn sv-btn-small" id="modal-fav-btn">Favorito</button>
+      <button class="sv-btn sv-btn-small sv-btn-danger" id="modal-delete-btn">Borrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+</body>
+</html>

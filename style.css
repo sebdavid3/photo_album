@@ -1,0 +1,878 @@
+/*=============================================
+   VARIABLES
+   =============================================*/
+:root {
+  --container_color: #ffc878;
+  --container_color2: #f8ba70;
+  --container_color3: #eba867;
+  --text_color: #331f28;
+  --text_shadow: #ce9c5f;
+  --gradient-bg: linear-gradient(180deg, var(--container_color) 0%, var(--container_color2) 50%, var(--container_color3) 100%);
+  --link: rgb(66, 120, 206);
+  --link-hover: rgb(26, 185, 56);
+  --error: #c0392b;
+  --success: #27ae60;
+}
+
+/*=============================================
+   FONTS
+   =============================================*/
+@font-face {
+  font-family: 'SVBoldHu';
+  src: url('assets/SVBoldHu.woff2') format('woff2'),
+       url('assets/SVBoldHu.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Stardew Valley All Caps';
+  src: url('assets/StardewValley-AllCaps.woff2') format('woff2'),
+       url('assets/StardewValley-AllCaps.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Stardew Valley';
+  src: url('assets/StardewValley.woff2') format('woff2'),
+       url('assets/StardewValley.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*=============================================
+   BASE
+   =============================================*/
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  cursor: url("assets/cursor.webp"), auto;
+}
+
+body {
+  background-image: url("assets/bg.webp");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  font-family: 'Stardew Valley';
+  font-size: 32px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  color: var(--text_color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100dvh;
+  width: 100dvw;
+  padding: 2em;
+}
+
+.content {
+  text-align: left;
+}
+
+a {
+  color: var(--link);
+  transition: all 0.3s ease;
+}
+a:hover {
+  color: var(--link-hover);
+}
+
+b, strong {
+  font-family: SVBoldHu;
+}
+
+code {
+  font-family: unset;
+  background-color: rgba(173, 81, 11, 0.349);
+}
+
+.btn {
+  display: inline-block;
+  background-color: var(--container_color);
+  border: none;
+  border-radius: 16px;
+}
+
+h1 {
+  font-family: 'Stardew Valley All Caps';
+  font-size: 72px;
+  font-weight: 500;
+}
+
+h2, h3 {
+  font-family: SVBoldHu;
+}
+
+h2 { font-size: 39px; }
+h3 { font-size: 26px; }
+
+/*=============================================
+   SCROLLBAR
+   =============================================*/
+::-webkit-scrollbar {
+  width: 12px;
+  background: #db7812;
+}
+::-webkit-scrollbar-thumb {
+  background: #ad520b;
+}
+
+/*=============================================
+   MOVING CLOUDS
+   =============================================*/
+.marquee {
+  z-index: -10;
+  position: fixed;
+  opacity: 0.8;
+  display: flex;
+  animation: marquee 150s linear infinite running;
+}
+.marquee .clouds {
+  width: 100%;
+}
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/*=============================================
+   MENU CONTAINER
+   =============================================*/
+.menu {
+  width: 100%;
+  max-width: 1200px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/*=============================================
+   TABS
+   =============================================*/
+.menu__tabs__container {
+  padding-left: 32px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+.menu__tabs__container .menu__tab {
+  border-image-source: url("assets/tab_border.png");
+  border-style: solid;
+  border-width: 20px;
+  border-image-slice: 24 22;
+  border-image-repeat: round;
+  border-radius: 20px;
+  width: 88px;
+  height: 84px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.menu__tabs__container .menu__tab--active {
+  height: 72px;
+}
+
+.menu__tabs__container .menu__tab .menu__img {
+  height: 48px;
+}
+
+/*=============================================
+   MAIN CONTENT
+   =============================================*/
+.main {
+  border-image-source: url("assets/border.png");
+  padding: 1em;
+  border-style: solid;
+  border-width: 20px;
+  border-image-slice: 24 22;
+  border-image-repeat: round;
+  border-radius: 20px;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background: var(--gradient-bg);
+}
+
+/*=============================================
+   TOOLTIPS
+   =============================================*/
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]:before,
+[data-tooltip]:after {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-tooltip]:before {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, calc(100% + 15px));
+  padding: 10px;
+  font-family: 'Stardew Valley';
+  font-size: 32px;
+  line-height: 30px;
+  color: var(--text_color);
+  text-shadow: var(--text_shadow) -2px 1px;
+  content: attr(data-tooltip);
+  background-color: var(--container_color);
+  overflow: hidden;
+  white-space: nowrap;
+  filter: drop-shadow(5px 5px rgba(0, 0, 0, 0.3));
+  border-style: solid;
+  border-width: 20px;
+  border-image-slice: 24 22;
+  border-image-repeat: round;
+  border-radius: 20px;
+  border-image-source: url("assets/tooltip_border.png");
+}
+
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after {
+  visibility: visible;
+  opacity: 1;
+  z-index: 120;
+}
+
+/*=============================================
+   LOGIN OVERLAY
+   =============================================*/
+.login-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.login-box {
+  border-image-source: url("assets/border.png");
+  border-style: solid;
+  border-width: 24px;
+  border-image-slice: 24 22;
+  border-image-repeat: round;
+  border-radius: 20px;
+  background: var(--gradient-bg);
+  padding: 2em 3em;
+  text-align: center;
+  max-width: 500px;
+  width: 90%;
+  filter: drop-shadow(8px 8px rgba(0, 0, 0, 0.4));
+}
+
+.login-box h1 {
+  font-size: 56px;
+  margin-bottom: 0.2em;
+}
+
+.login-box .subtitle {
+  font-size: 24px;
+  margin-bottom: 1.5em;
+  opacity: 0.8;
+}
+
+.login-box .input-group {
+  margin-bottom: 1em;
+}
+
+.login-box .input-group input {
+  width: 100%;
+  padding: 12px 16px;
+  font-family: 'Stardew Valley';
+  font-size: 24px;
+  background: rgba(0, 0, 0, 0.1);
+  border: 3px solid var(--container_color3);
+  border-radius: 8px;
+  color: var(--text_color);
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.login-box .input-group input:focus {
+  border-color: var(--text_color);
+}
+
+.login-box .input-group input::placeholder {
+  color: rgba(51, 31, 40, 0.4);
+}
+
+.login-error {
+  color: var(--error);
+  font-size: 20px;
+  min-height: 28px;
+  margin-top: 0.5em;
+}
+
+/*=============================================
+   BUTTONS (SV STYLE)
+   =============================================*/
+.sv-btn {
+  font-family: 'Stardew Valley';
+  font-size: 26px;
+  color: var(--text_color);
+  background: var(--gradient-bg);
+  border-image-source: url("assets/tooltip_border.png");
+  border-style: solid;
+  border-width: 16px;
+  border-image-slice: 24 22;
+  border-image-repeat: round;
+  border-radius: 14px;
+  padding: 6px 28px;
+  cursor: url("assets/cursor.webp"), pointer;
+  transition: transform 0.1s, filter 0.1s;
+  filter: drop-shadow(3px 3px rgba(0, 0, 0, 0.3));
+}
+
+.sv-btn:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(4px 4px rgba(0, 0, 0, 0.4));
+}
+
+.sv-btn:active {
+  transform: scale(0.97);
+}
+
+.sv-btn-danger {
+  background: linear-gradient(180deg, #e8a0a0, #c0392b);
+  color: #fff;
+}
+
+.sv-btn-small {
+  font-size: 20px;
+  border-width: 12px;
+  padding: 4px 18px;
+}
+
+/*=============================================
+   FORM INPUTS
+   =============================================*/
+.sv-input,
+.sv-textarea {
+  font-family: 'Stardew Valley';
+  font-size: 22px;
+  color: var(--text_color);
+  background: rgba(0, 0, 0, 0.08);
+  border: 3px solid var(--container_color3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.sv-input:focus,
+.sv-textarea:focus {
+  border-color: var(--text_color);
+}
+
+.sv-input::placeholder,
+.sv-textarea::placeholder {
+  color: rgba(51, 31, 40, 0.4);
+}
+
+.sv-textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+}
+
+.form-group {
+  margin-bottom: 1em;
+}
+
+.form-group label {
+  display: block;
+  font-family: SVBoldHu;
+  font-size: 22px;
+  margin-bottom: 0.3em;
+}
+
+/*=============================================
+   FILE INPUT (STYLED)
+   =============================================*/
+.file-input-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.file-input-wrapper input[type="file"] {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  cursor: url("assets/cursor.webp"), pointer;
+}
+
+.file-name {
+  display: inline-block;
+  font-size: 18px;
+  margin-left: 0.5em;
+  vertical-align: middle;
+  opacity: 0.7;
+}
+
+/*=============================================
+   PHOTO GALLERY GRID
+   =============================================*/
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1em;
+  padding: 0.5em 0;
+}
+
+.photo-card {
+  border-image-source: url("assets/tooltip_border.png");
+  border-style: solid;
+  border-width: 14px;
+  border-image-slice: 24 22;
+  border-image-repeat: round;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s, filter 0.2s;
+  cursor: url("assets/cursor.webp"), pointer;
+}
+
+.photo-card:hover {
+  transform: translateY(-4px);
+  filter: drop-shadow(4px 6px rgba(0, 0, 0, 0.3));
+}
+
+.photo-card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-card .photo-info {
+  padding: 0.6em 0.8em;
+}
+
+.photo-card .photo-title {
+  font-family: SVBoldHu;
+  font-size: 18px;
+  margin-bottom: 0.2em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.photo-card .photo-date {
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+.photo-card .photo-fav {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 20px;
+  filter: drop-shadow(1px 1px rgba(0,0,0,0.5));
+}
+
+/*=============================================
+   UPLOAD SECTION
+   =============================================*/
+.upload-section {
+  max-width: 600px;
+}
+
+.upload-preview {
+  margin: 1em 0;
+  text-align: center;
+}
+
+.upload-preview img {
+  max-width: 100%;
+  max-height: 250px;
+  border-radius: 8px;
+  border: 3px solid var(--container_color3);
+}
+
+.upload-progress {
+  margin: 0.5em 0;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  overflow: hidden;
+  display: none;
+}
+
+.upload-progress .bar {
+  height: 100%;
+  background: var(--success);
+  width: 0%;
+  transition: width 0.3s;
+}
+
+/*=============================================
+   LETTERS (CARTAS)
+   =============================================*/
+.letters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.letter-card {
+  border-image-source: url("assets/tooltip_border.png");
+  border-style: solid;
+  border-width: 14px;
+  border-image-slice: 24 22;
+  border-image-repeat: round;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 1em;
+}
+
+.letter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  margin-bottom: 0.8em;
+}
+
+.letter-title {
+  font-family: SVBoldHu;
+  font-size: 24px;
+}
+
+.letter-date {
+  font-size: 16px;
+  opacity: 0.6;
+}
+
+.letter-content {
+  font-size: 20px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  margin-bottom: 0.8em;
+}
+
+.letter-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  font-size: 16px;
+  padding: 4px 12px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+}
+
+.letter-actions {
+  margin-top: 0.8em;
+  display: flex;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+.letter-form {
+  margin-bottom: 2em;
+  padding: 1em;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  border: 2px solid var(--container_color3);
+}
+
+.letter-form.hidden {
+  display: none;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1em;
+  flex-wrap: wrap;
+  gap: 0.5em;
+}
+
+.no-data {
+  text-align: center;
+  padding: 2em;
+  opacity: 0.5;
+  font-size: 24px;
+}
+
+/*=============================================
+   MODAL / LIGHTBOX
+   =============================================*/
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal-content {
+  border-image-source: url("assets/border.png");
+  border-style: solid;
+  border-width: 24px;
+  border-image-slice: 24 22;
+  border-image-repeat: round;
+  border-radius: 16px;
+  background: var(--gradient-bg);
+  padding: 1.5em;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+}
+
+.modal-content img {
+  max-width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  border-radius: 6px;
+}
+
+.modal-content h2 {
+  margin-top: 0.5em;
+  font-size: 30px;
+}
+
+.modal-content p {
+  font-size: 20px;
+  margin-top: 0.5em;
+  line-height: 1.5;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  font-size: 36px;
+  font-family: SVBoldHu;
+  cursor: url("assets/cursor.webp"), pointer;
+  color: var(--text_color);
+  background: none;
+  border: none;
+  line-height: 1;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.5em;
+  margin-top: 1em;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/*=============================================
+   SETTINGS
+   =============================================*/
+.settings-section {
+  max-width: 500px;
+}
+
+.settings-section .form-group {
+  margin-bottom: 1.5em;
+}
+
+/*=============================================
+   LOADING & ERROR
+   =============================================*/
+.loading {
+  text-align: center;
+  padding: 2em;
+  font-size: 22px;
+  opacity: 0.7;
+}
+
+.loading::after {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+  border: 3px solid var(--text_color);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-msg {
+  color: var(--error);
+  font-size: 18px;
+  margin-top: 0.5em;
+}
+
+.success-msg {
+  color: var(--success);
+  font-size: 18px;
+  margin-top: 0.5em;
+}
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gradient-bg);
+  border-image-source: url("assets/tooltip_border.png");
+  border-style: solid;
+  border-width: 14px;
+  border-image-slice: 24 22;
+  border-image-repeat: round;
+  border-radius: 12px;
+  padding: 0.6em 1.5em;
+  font-family: 'Stardew Valley';
+  font-size: 20px;
+  z-index: 3000;
+  animation: fadeInUp 0.3s ease, fadeOut 0.3s ease 2.5s forwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+}
+
+/*=============================================
+   GENERAL UTILITY
+   =============================================*/
+.hidden {
+  display: none !important;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.mb-1 { margin-bottom: 0.5em; }
+.mb-2 { margin-bottom: 1em; }
+
+/*=============================================
+   MOBILE
+   =============================================*/
+@media (max-width: 900px) {
+  body {
+    padding: 1em;
+  }
+
+  h1 {
+    font-size: 48px;
+  }
+
+  .menu {
+    flex-direction: row;
+  }
+
+  .menu__tabs__container {
+    margin-top: 32px;
+    width: 80px;
+    flex-direction: column;
+    align-items: flex-end;
+    padding-left: unset;
+    overflow: visible;
+  }
+
+  .menu__tabs__container .menu__tab {
+    border-image-source: url("assets/tab_border_side.png");
+    width: 66px;
+    height: 72px;
+    justify-content: unset;
+  }
+
+  .menu__tabs__container .menu__tab--active {
+    width: 54px;
+  }
+
+  .menu__tabs__container .menu__tab .menu__img {
+    height: 32px;
+  }
+
+  .main {
+    height: 100%;
+    overflow: auto;
+  }
+
+  [data-tooltip]:before {
+    bottom: unset;
+    left: unset;
+    top: 0;
+    right: 0;
+    transform: translateX(calc(100% + 15px)) translateY(calc(-50% + 12px));
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  .login-box h1 {
+    font-size: 36px;
+  }
+
+  .login-box .subtitle {
+    font-size: 18px;
+  }
+
+  .modal-content {
+    padding: 1em;
+    max-width: 95vw;
+  }
+
+  .letter-title {
+    font-size: 20px;
+  }
+
+  .letter-content {
+    font-size: 16px;
+  }
+
+  .sv-btn {
+    font-size: 20px;
+    padding: 4px 18px;
+    border-width: 12px;
+  }
+}
+
+@media (max-width: 500px) {
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.5em;
+  }
+
+  .photo-card .photo-title {
+    font-size: 14px;
+  }
+}

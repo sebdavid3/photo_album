@@ -1,0 +1,5 @@
+{
+  "version": 2,
+  "buildCommand": "chmod +x scripts/generate-config.sh && ./scripts/generate-config.sh",
+  "outputDirectory": "."
+}
