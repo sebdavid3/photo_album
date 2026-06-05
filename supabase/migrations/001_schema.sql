@@ -60,7 +60,7 @@ AS $$
 DECLARE
   stored_hash TEXT;
 BEGIN
-  SELECT password_hash INTO stored_hash FROM settings WHERE id = 1;
+  SELECT password_hash INTO stored_hash FROM public.settings WHERE id = 1;
   RETURN stored_hash = extensions.crypt(password_attempt, stored_hash);
 END;
 $$;
@@ -73,7 +73,7 @@ SECURITY DEFINER
 SET search_path = ''
 AS $$
 BEGIN
-  UPDATE settings 
+  UPDATE public.settings 
   SET password_hash = extensions.crypt(new_password, extensions.gen_salt('bf')),
       updated_at = NOW()
   WHERE id = 1;
