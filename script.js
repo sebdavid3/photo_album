@@ -349,10 +349,39 @@ async function loadAlbums() {
     if (!albums.length) { c.innerHTML = '<p class="no-data">Aun no hay albumes. Crea el primero!</p>'; return }
     c.innerHTML = '<div class="albums-grid"></div>'
     const grid = c.querySelector('.albums-grid')
+
+    // Fetch all album_photos for thumbnails
+    const allLinks = await fetchPublic('album_photos')
+    const linksByAlbum = {}
+    allLinks.forEach(l => {
+      if (!linksByAlbum[l.album_id]) linksByAlbum[l.album_id] = []
+      linksByAlbum[l.album_id].push(l.photo_id)
+    })
+
+    // Get up to 4 photo URLs per album (latest)
+    const photoIdsToFetch = new Set()
+    const thumbIds = {}
+    albums.forEach(a => {
+      const ids = (linksByAlbum[a.id] || []).reverse().slice(0, 4)
+      thumbIds[a.id] = ids
+      ids.forEach(id => photoIdsToFetch.add(id))
+    })
+
+    let photoUrlMap = {}
+    if (photoIdsToFetch.size) {
+      const photos = await fetchPublic('photos', q => q.in('id', Array.from(photoIdsToFetch)))
+      photoUrlMap = {}
+      photos.forEach(p => { photoUrlMap[p.id] = p.image_url })
+    }
+
     albums.forEach(a => {
       const card = document.createElement('div')
       card.className = 'album-card'
-      card.innerHTML = `<div class="album-card-title">${a.title}</div><div class="album-card-desc">${a.description || ''}</div><div class="album-card-date">${formatDate(a.created_at)}</div>`
+      const thumbs = thumbIds[a.id] || []
+      const thumbsHtml = thumbs.length
+        ? `<div class="album-card-thumbs">${thumbs.map(id => photoUrlMap[id] ? `<img src="${photoUrlMap[id]}" alt="" />` : '').join('')}</div>`
+        : ''
+      card.innerHTML = `${thumbsHtml}<div class="album-card-title">${a.title}</div><div class="album-card-desc">${a.description || ''}</div><div class="album-card-date">${formatDate(a.created_at)}</div>`
       card.addEventListener('click', () => openAlbum(a))
       grid.appendChild(card)
     })
