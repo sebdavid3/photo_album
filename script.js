@@ -186,8 +186,8 @@ async function loadCofre() {
 // CAT MUSIC (background player)
 // ============================================================
 const musicFiles = [
-  // Agrega aqui los nombres de tus archivos de audio en assets/audios/
-  // Ejemplo: { file: 'cancion.mp3', name: 'Mi Cancion', artist: 'Artista' }
+  // Agrega aqui los nombres de tus archivos de audio en assets/audio/
+  // Ejemplo: { file: 'Stardew Valley OST - Pelican Town.mp3', name: 'Pelican Town', artist: 'ConcernedApe' },
 ]
 
 let bgAudio = null
@@ -225,7 +225,7 @@ function playTrackBg(idx) {
     bgAudio = null
   }
 
-  bgAudio = new Audio(`assets/audios/${track.file}`)
+  bgAudio = new Audio(`assets/audio/${track.file}`)
   bgAudio.loop = true
   bgAudio.volume = 0.3
 
