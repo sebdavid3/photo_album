@@ -913,13 +913,6 @@ h3 { font-size: 26px; }
    =============================================*/
 .pdf-viewer {
   margin: 0.5em 0;
-  border-image-source: url("assets/tooltip_border.png");
-  border-style: solid;
-  border-width: 14px;
-  border-image-slice: 24 22;
-  border-image-repeat: round;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
@@ -972,19 +965,11 @@ h3 { font-size: 26px; }
   text-align: center;
 }
 
-.pdf-canvas-wrap {
-  display: flex;
-  justify-content: center;
-  padding: 0.5em;
-  background: rgba(0, 0, 0, 0.05);
-}
-
 .pdf-canvas {
   max-width: 100%;
   height: auto;
   display: block;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  margin: 0 auto;
 }
 
 /*=============================================
@@ -1098,9 +1083,7 @@ h3 { font-size: 26px; }
     min-width: 60px;
   }
 
-  .pdf-canvas-wrap {
-    padding: 0.3em;
-  }
+
 }
 
 @media (max-width: 500px) {

@@ -615,13 +615,9 @@ async function renderPDF(containerId, url) {
     nav.appendChild(nextBtn)
     container.appendChild(nav)
 
-    const canvasWrap = document.createElement('div')
-    canvasWrap.className = 'pdf-canvas-wrap'
-    container.appendChild(canvasWrap)
-
     const canvas = document.createElement('canvas')
     canvas.className = 'pdf-canvas'
-    canvasWrap.appendChild(canvas)
+    container.appendChild(canvas)
 
     let currentPage = 1
 
