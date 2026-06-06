@@ -940,9 +940,7 @@ h3 { font-size: 26px; }
   align-items: center;
   justify-content: center;
   gap: 1em;
-  padding: 0.6em;
-  background: rgba(0, 0, 0, 0.08);
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  padding: 0.5em 0;
 }
 
 .pdf-nav .sv-btn-small {
