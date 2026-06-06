@@ -152,7 +152,7 @@ async function loadGallery() {
       const card = document.createElement('div')
       card.className = 'photo-card'
       card.style.position = 'relative'
-      card.innerHTML = `<img src="${p.image_url}" alt="${p.title}" loading="lazy" />${p.favorite ? '<span class="photo-fav">⭐</span>' : ''}<div class="photo-info"><div class="photo-title">${p.title}</div><div class="photo-date">${formatDate(p.created_at)}</div></div>`
+      card.innerHTML = `<img src="${p.image_url}" alt="${p.title}" loading="lazy" /><div class="photo-info"><div class="photo-title">${p.title}</div><div class="photo-date">${formatDate(p.created_at)}</div></div>`
       card.addEventListener('click', () => openPhotoModal(p))
       grid.appendChild(card)
     })
@@ -312,8 +312,6 @@ function openPhotoModal(photo) {
   document.getElementById('modal-title').textContent = photo.title
   document.getElementById('modal-desc').textContent = photo.description || ''
   document.getElementById('modal-date').textContent = formatDate(photo.created_at)
-  document.getElementById('modal-fav-btn').textContent = photo.favorite ? '⭐ Quitar favorito' : '☆ Marcar favorito'
-  document.getElementById('modal-fav-btn').onclick = requireAuth(() => toggleFavorite(photo.id))
   document.getElementById('modal-delete-btn').onclick = requireAuth(() => deletePhoto(photo.id))
   document.getElementById('photo-modal').classList.remove('hidden')
 }
@@ -322,12 +320,6 @@ function closePhotoModal() { document.getElementById('photo-modal').classList.ad
 document.getElementById('modal-close').addEventListener('click', closePhotoModal)
 document.getElementById('photo-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closePhotoModal() })
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closePhotoModal() })
-
-async function toggleFavorite(id) {
-  const r = await api('toggle_favorite', { id })
-  toast(r.photo.favorite ? 'Favorito ⭐' : 'Favorito removido')
-  closePhotoModal(); loadGallery()
-}
 
 async function deletePhoto(id) {
   if (!confirm('Borrar este recuerdo?')) return
