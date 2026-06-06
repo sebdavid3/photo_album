@@ -135,7 +135,6 @@ function openTab(evt, tabName) {
   if (tabName === 'cofre') loadCofre()
   if (tabName === 'albumes') loadAlbums()
   if (tabName === 'cartas') loadLetters()
-  if (tabName === 'musica') loadMusic()
   if (tabName === 'ajustes') { /* empty */ }
 }
 
@@ -184,156 +183,69 @@ async function loadCofre() {
 }
 
 // ============================================================
-// MUSIC PLAYER
+// CAT MUSIC (background player)
 // ============================================================
 const musicFiles = [
   // Agrega aqui los nombres de tus archivos de audio en assets/audios/
   // Ejemplo: { file: 'cancion.mp3', name: 'Mi Cancion', artist: 'Artista' }
 ]
 
-let musicCurrentIndex = -1
-let audioEl = null
+let bgAudio = null
+let currentTrackIdx = -1
 
-function getAudioSrc(file) {
-  return `assets/audios/${file}`
-}
-
-async function loadMusic() {
-  const list = document.getElementById('music-playlist')
-  list.innerHTML = '<div class="loading">Buscando canciones...</div>'
-
+function toggleBgMusic() {
   if (!musicFiles.length) {
-    list.innerHTML = '<p class="no-data" style="font-size:18px;">No hay canciones. Agrega archivos .mp3, .ogg o .wav a <code>assets/audios/</code> y registralos en el array <code>musicFiles</code> en script.js.</p>'
+    toast('No hay canciones en assets/audios/')
     return
   }
 
-  list.innerHTML = ''
-  musicFiles.forEach((track, i) => {
-    const item = document.createElement('div')
-    item.className = 'music-playlist-item' + (i === musicCurrentIndex ? ' active' : '')
-    item.innerHTML = `
-      <span class="music-playlist-idx">${String(i + 1).padStart(2, '0')}</span>
-      <span class="music-playlist-info">
-        <span class="music-playlist-name">${track.name}</span>
-        <span class="music-playlist-artist">${track.artist || ''}</span>
-      </span>
-      <span class="music-playlist-dur">${track.duration || ''}</span>
-    `
-    item.addEventListener('click', () => playTrack(i))
-    list.appendChild(item)
-  })
-}
-
-function playTrack(index) {
-  if (index < 0 || index >= musicFiles.length) return
-
-  if (audioEl) {
-    audioEl.pause()
-    audioEl = null
+  if (bgAudio && !bgAudio.paused) {
+    bgAudio.pause()
+    document.getElementById('music-indicator').classList.remove('playing')
+    return
   }
 
-  musicCurrentIndex = index
-  const track = musicFiles[index]
-  audioEl = new Audio(getAudioSrc(track.file))
+  if (bgAudio) {
+    bgAudio.play()
+    document.getElementById('music-indicator').classList.add('playing')
+    return
+  }
 
-  audioEl.addEventListener('loadedmetadata', () => {
-    document.getElementById('music-duration').textContent = formatTime(audioEl.duration)
+  currentTrackIdx = 0
+  playTrackBg(0)
+}
+
+function playTrackBg(idx) {
+  if (idx < 0 || idx >= musicFiles.length) return
+  currentTrackIdx = idx
+  const track = musicFiles[idx]
+
+  if (bgAudio) {
+    bgAudio.pause()
+    bgAudio = null
+  }
+
+  bgAudio = new Audio(`assets/audios/${track.file}`)
+  bgAudio.loop = true
+  bgAudio.volume = 0.3
+
+  bgAudio.addEventListener('ended', () => {
+    // loop is true so this shouldn't fire, but just in case
   })
 
-  audioEl.addEventListener('timeupdate', () => {
-    if (audioEl.duration) {
-      const pct = (audioEl.currentTime / audioEl.duration) * 100
-      document.getElementById('music-progress-fill').style.width = pct + '%'
-      document.getElementById('music-current-time').textContent = formatTime(audioEl.currentTime)
-    }
-  })
-
-  audioEl.addEventListener('ended', () => {
-    nextTrack()
-  })
-
-  audioEl.addEventListener('error', () => {
+  bgAudio.addEventListener('error', () => {
     toast('Error al reproducir: ' + track.file)
-    document.getElementById('music-play-btn').textContent = '▶'
+    document.getElementById('music-indicator').classList.remove('playing')
   })
 
-  document.getElementById('music-track-name').textContent = track.name
-  document.getElementById('music-track-artist').textContent = track.artist || ''
-  document.getElementById('music-play-btn').textContent = '⏸'
-  document.getElementById('music-progress-fill').style.width = '0%'
-  document.getElementById('music-current-time').textContent = '0:00'
-  audioEl.volume = parseFloat(document.getElementById('music-volume-slider').value)
-  audioEl.play().catch(() => { /* autoplay may be blocked */ })
-
-  highlightPlaylist()
-  loadMusic()
-}
-
-function togglePlay() {
-  if (!audioEl) {
-    if (musicCurrentIndex >= 0) playTrack(musicCurrentIndex)
-    else if (musicFiles.length) playTrack(0)
-    return
-  }
-
-  if (audioEl.paused) {
-    audioEl.play()
-    document.getElementById('music-play-btn').textContent = '⏸'
-  } else {
-    audioEl.pause()
-    document.getElementById('music-play-btn').textContent = '▶'
-  }
-}
-
-function prevTrack() {
-  if (musicFiles.length === 0) return
-  const idx = (musicCurrentIndex - 1 + musicFiles.length) % musicFiles.length
-  playTrack(idx)
-}
-
-function nextTrack() {
-  if (musicFiles.length === 0) return
-  const idx = (musicCurrentIndex + 1) % musicFiles.length
-  playTrack(idx)
-}
-
-function highlightPlaylist() {
-  document.querySelectorAll('.music-playlist-item').forEach((el, i) => {
-    el.classList.toggle('active', i === musicCurrentIndex)
+  bgAudio.play().then(() => {
+    document.getElementById('music-indicator').classList.add('playing')
+  }).catch(() => {
+    toast('Haz clic en el gato para reproducir musica')
   })
 }
 
-function formatTime(sec) {
-  if (!sec || !isFinite(sec)) return '0:00'
-  const m = Math.floor(sec / 60)
-  const s = Math.floor(sec % 60)
-  return `${m}:${s.toString().padStart(2, '0')}`
-}
-
-document.getElementById('music-play-btn').addEventListener('click', togglePlay)
-document.getElementById('music-prev-btn').addEventListener('click', prevTrack)
-document.getElementById('music-next-btn').addEventListener('click', nextTrack)
-
-document.getElementById('music-volume-slider').addEventListener('input', function() {
-  if (audioEl) audioEl.volume = parseFloat(this.value)
-})
-
-document.getElementById('music-progress-bar').addEventListener('click', function(e) {
-  if (!audioEl || !audioEl.duration) return
-  const rect = this.getBoundingClientRect()
-  const pct = (e.clientX - rect.left) / rect.width
-  audioEl.currentTime = pct * audioEl.duration
-})
-
-let musicProgressInterval = null
-
-// Keyboard shortcuts
-document.addEventListener('keydown', e => {
-  if (e.key === ' ' && document.getElementById('musica').style.display !== 'none') {
-    e.preventDefault()
-    togglePlay()
-  }
-})
+document.getElementById('avatar-mascot').addEventListener('click', toggleBgMusic)
 
 // ============================================================
 // UPLOAD MODAL

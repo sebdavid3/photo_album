@@ -9,8 +9,19 @@
 </head>
 <body>
 
-<div class="avatar-mascot" id="avatar-mascot">
-  <img src="assets/avatar.svg" alt="mascota" />
+<div class="avatar-mascot" id="avatar-mascot" title="Reproducir musica">
+  <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="cat-svg">
+    <path d="M4 4h4M24 4h4M6 6h2M10 6h2M18 6h2M22 6h2M2 8h2M10 8h4M16 8h4M26 8h2M0 10h2M8 10h2M14 10h2M18 10h2M24 10h2M28 10h2M0 12h2M8 12h6M20 12h4M28 12h2M0 14h2M8 14h6M20 14h6M28 14h2M0 16h2M8 16h4M22 16h4M28 16h2M0 18h2M8 18h4M22 18h4M28 18h2M0 20h2M6 20h2M12 20h6M22 20h2M28 20h2M0 22h2M6 22h2M12 22h6M22 22h2M28 22h2M0 24h2M6 24h2M12 24h6M22 24h2M28 24h2M2 26h2M8 26h4M18 26h4M26 26h2M4 28h4M24 28h4" fill="#f4a460"/>
+    <path d="M6 4h2M10 4h2M18 4h2M22 4h2M4 6h2M12 6h6M22 6h2M8 8h2M14 8h4M20 8h2M6 10h2M12 10h2M18 10h2M24 10h2M6 12h2M18 12h2M24 12h2M6 14h2M18 14h2M6 16h2M12 16h10M6 18h2M12 18h10M6 20h2M12 20h6M22 20h2M6 22h2M12 22h6M22 22h2M2 24h2M10 24h4M18 24h6M4 26h2M14 26h4M24 26h2" fill="#e8923a"/>
+    <path d="M8 4h2M12 4h6M20 4h2M4 8h4M20 8h6M2 10h4M24 10h2M2 12h4M24 12h2M2 14h4M26 14h2M2 16h4M26 16h2M2 18h4M26 18h2M2 20h4M24 20h2M2 22h4M24 22h2M4 24h2M26 24h2" fill="#fff" fill-opacity="0.3"/>
+    <path d="M8 12h2M18 12h2" fill="#331f28"/>
+    <path d="M10 12h2M20 12h2" fill="#fff"/>
+    <path d="M10 30h2M18 30h2" fill="#f4a460"/>
+    <path d="M8 30h2M20 30h2" fill="#e8923a"/>
+    <path d="M8 14h2M18 14h2" fill="#331f28"/>
+    <path d="M6 14h2M16 14h2" fill="#e8923a"/>
+  </svg>
+  <div class="music-indicator" id="music-indicator">♩</div>
 </div>
 
 <!-- MOVING CLOUDS -->
@@ -39,9 +50,6 @@
     </button>
     <button class="btn menu__tab" data-tooltip="Cofre" onclick="openTab(event,'cofre')">
       <img src="assets/bag.svg" class="menu__img" alt="cofre" />
-    </button>
-    <button class="btn menu__tab" data-tooltip="Musica" onclick="openTab(event,'musica')">
-      <svg class="menu__img" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4v16a4 4 0 1 0 4 4V12l12-2v6a4 4 0 1 0 4 4V4L12 4z" fill="currentColor"/></svg>
     </button>
     <button class="btn menu__tab" data-tooltip="Ajustes" onclick="openTab(event,'ajustes')">
       <img src="assets/console.svg" class="menu__img" alt="ajustes" />
@@ -188,42 +196,6 @@
     <div id="ajustes" class="content" style="display: none;">
       <h2>Ajustes</h2>
       <p style="opacity:0.6;font-size:22px;">La sesion se gestiona desde los botones de accion (subir foto, crear album, etc.)</p>
-    </div>
-
-    <!-- ========== MUSICA ========== -->
-    <div id="musica" class="content" style="display: none;">
-      <div class="section-header">
-        <h2>Musica</h2>
-        <button class="sv-btn sv-btn-small" id="music-refresh-btn" onclick="loadMusic()">Recargar</button>
-      </div>
-      <div id="music-player" class="music-player">
-        <div class="music-player-header">
-          <div class="music-track-art">🎵</div>
-          <div class="music-track-info">
-            <div class="music-track-name" id="music-track-name">Sin cancion</div>
-            <div class="music-track-artist" id="music-track-artist">Agrega archivos a assets/audios/</div>
-          </div>
-        </div>
-        <div class="music-progress">
-          <span class="music-time" id="music-current-time">0:00</span>
-          <div class="music-progress-bar" id="music-progress-bar">
-            <div class="music-progress-fill" id="music-progress-fill"></div>
-          </div>
-          <span class="music-time" id="music-duration">0:00</span>
-        </div>
-        <div class="music-controls">
-          <button class="sv-btn sv-btn-small" id="music-prev-btn" title="Anterior">⏮</button>
-          <button class="sv-btn" id="music-play-btn" title="Reproducir">▶</button>
-          <button class="sv-btn sv-btn-small" id="music-next-btn" title="Siguiente">⏭</button>
-          <span class="music-volume">
-            <label for="music-volume-slider">🔊</label>
-            <input type="range" id="music-volume-slider" min="0" max="1" step="0.05" value="0.5" />
-          </span>
-        </div>
-        <div class="music-playlist" id="music-playlist">
-          <div class="loading">Buscando canciones...</div>
-        </div>
-      </div>
     </div>
 
   </div><!-- end main -->
