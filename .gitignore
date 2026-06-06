@@ -5,3 +5,4 @@ config.js
 supabase/.temp/
 stardewvalleytheme-main.zip
 stardewvalleytheme-main/
+.vercel

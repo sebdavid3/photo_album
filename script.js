@@ -425,17 +425,25 @@ async function loadLetters() {
       const card = document.createElement('div')
       card.className = 'letter-card'
       const isImage = l.pdf_url && l.pdf_name && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(l.pdf_name)
+      const pdfId = `pdf-${l.id}`
 
       card.innerHTML = `
         <div class="letter-header"><span class="letter-title">${l.title}</span><span class="letter-date">${formatDate(l.created_at)}</span></div>
         <div class="letter-content">${l.content || ''}</div>
-        ${l.pdf_url ? (isImage ? `<img src="${l.pdf_url}" alt="${l.pdf_name}" class="letter-attachment-img" />` : `<embed src="${l.pdf_url}" type="application/pdf" class="letter-attachment-pdf" />`) : ''}
+        ${l.pdf_url ? (isImage
+          ? `<img src="${l.pdf_url}" alt="${l.pdf_name}" class="letter-attachment-img" />`
+          : `<div id="${pdfId}" class="pdf-viewer" data-url="${l.pdf_url}"><div class="pdf-viewer-loading">Cargando PDF...</div></div>`
+        ) : ''}
         ${l.pdf_url ? `<div style="margin-top:0.5em;"><a href="${l.pdf_url}" target="_blank" class="letter-pdf" download>📎 ${l.pdf_name || 'Descargar adjunto'}</a></div>` : ''}
         <div class="letter-actions">
           <button class="sv-btn sv-btn-small edit-letter-btn" data-id="${l.id}">Editar</button>
           <button class="sv-btn sv-btn-small sv-btn-danger delete-letter-btn" data-id="${l.id}">Borrar</button>
         </div>`
       list.appendChild(card)
+
+      if (l.pdf_url && !isImage) {
+        renderPDF(pdfId, l.pdf_url)
+      }
     })
     list.querySelectorAll('.edit-letter-btn').forEach(b => b.addEventListener('click', () => {
       (requireAuth(() => editLetter(b.dataset.id)))()
@@ -507,6 +515,74 @@ async function deleteLetter(id) {
   if (!confirm('Borrar esta carta?')) return
   await api('delete_letter', { id })
   toast('Carta borrada'); loadLetters()
+}
+
+// ============================================================
+// PDF RENDERER (custom, styled)
+// ============================================================
+async function renderPDF(containerId, url) {
+  const container = document.getElementById(containerId)
+  if (!container) return
+
+  try {
+    const pdf = await pdfjsLib.getDocument(url).promise
+    container.innerHTML = ''
+
+    const nav = document.createElement('div')
+    nav.className = 'pdf-nav'
+
+    const prevBtn = document.createElement('button')
+    prevBtn.className = 'sv-btn sv-btn-small'
+    prevBtn.textContent = '◀'
+    prevBtn.disabled = true
+
+    const pageInfo = document.createElement('span')
+    pageInfo.className = 'pdf-page-info'
+
+    const nextBtn = document.createElement('button')
+    nextBtn.className = 'sv-btn sv-btn-small'
+    nextBtn.textContent = '▶'
+
+    nav.appendChild(prevBtn)
+    nav.appendChild(pageInfo)
+    nav.appendChild(nextBtn)
+    container.appendChild(nav)
+
+    const canvasWrap = document.createElement('div')
+    canvasWrap.className = 'pdf-canvas-wrap'
+    container.appendChild(canvasWrap)
+
+    const canvas = document.createElement('canvas')
+    canvas.className = 'pdf-canvas'
+    canvasWrap.appendChild(canvas)
+
+    let currentPage = 1
+
+    async function renderPage(pageNum) {
+      const page = await pdf.getPage(pageNum)
+      const vp = page.getViewport({ scale: 1.5 })
+      canvas.width = vp.width
+      canvas.height = vp.height
+      const ctx = canvas.getContext('2d')
+      await page.render({ canvasContext: ctx, viewport: vp }).promise
+      pageInfo.textContent = `${pageNum} / ${pdf.numPages}`
+      prevBtn.disabled = pageNum <= 1
+      nextBtn.disabled = pageNum >= pdf.numPages
+      currentPage = pageNum
+    }
+
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 1) renderPage(currentPage - 1)
+    })
+    nextBtn.addEventListener('click', () => {
+      if (currentPage < pdf.numPages) renderPage(currentPage + 1)
+    })
+
+    renderPage(1)
+  } catch (e) {
+    container.innerHTML = `<p class="error-msg">Error al cargar PDF</p>`
+    console.error('PDF render error:', e)
+  }
 }
 
 // ============================================================
