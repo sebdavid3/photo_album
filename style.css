@@ -1026,37 +1026,8 @@ html.logged-in .auth-btn.sv-btn {
 }
 
 /*=============================================
-   MOBILE
+   KROBUS AUTH BUTTON
    =============================================*/
-@media (max-width: 900px) {
-  body {
-    padding: 1em;
-  }
-
-  h1 {
-    font-size: 48px;
-  }
-
-  .menu {
-    flex-direction: row;
-  }
-
-  .menu__tabs__container {
-    margin-top: 32px;
-    width: 80px;
-    flex-direction: column;
-    align-items: flex-end;
-    padding-left: unset;
-    overflow: visible;
-  }
-
-  .menu__tabs__container .menu__tab {
-    border-image-source: url("assets/tab_border_side.png");
-    width: 66px;
-    height: 72px;
-    justify-content: unset;
-  }
-
 .krobus-btn {
   position: fixed;
   top: 16px;
@@ -1091,6 +1062,38 @@ html.logged-in .auth-btn.sv-btn {
   height: 100%;
   display: block;
 }
+
+/*=============================================
+   MOBILE
+   =============================================*/
+@media (max-width: 900px) {
+  body {
+    padding: 1em;
+  }
+
+  h1 {
+    font-size: 48px;
+  }
+
+  .menu {
+    flex-direction: row;
+  }
+
+  .menu__tabs__container {
+    margin-top: 32px;
+    width: 80px;
+    flex-direction: column;
+    align-items: flex-end;
+    padding-left: unset;
+    overflow: visible;
+  }
+
+  .menu__tabs__container .menu__tab {
+    border-image-source: url("assets/tab_border_side.png");
+    width: 66px;
+    height: 72px;
+    justify-content: unset;
+  }
 
 .menu__tabs__container .menu__tab--active {
     width: 54px;
