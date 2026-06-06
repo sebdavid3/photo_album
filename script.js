@@ -527,10 +527,9 @@ async function loadLetters() {
         <div class="letter-header"><span class="letter-title">${l.title}</span><span class="letter-date">${formatDate(l.created_at)}</span></div>
         <div class="letter-content">${l.content || ''}</div>
         ${l.pdf_url ? (isImage
-          ? `<div class="letter-attachment-wrap"><img src="${l.pdf_url}" alt="${l.pdf_name}" class="letter-attachment-img" /></div>`
+          ? `<div class="letter-attachment-wrap"><img src="${l.pdf_url}" alt="${l.pdf_name}" class="letter-attachment-img letter-attachment-img-clickable" data-url="${l.pdf_url}" data-title="${l.title}" /></div>`
           : `<div id="${pdfId}" class="pdf-viewer" data-url="${l.pdf_url}"><div class="pdf-viewer-loading">Cargando PDF...</div></div>`
         ) : ''}
-        ${l.pdf_url ? `<div style="margin-top:0.5em;"><a href="${l.pdf_url}" target="_blank" class="letter-pdf" download>📎 ${l.pdf_name || 'Descargar adjunto'}</a></div>` : ''}
         <div class="letter-actions">
           <button class="sv-btn sv-btn-small edit-letter-btn" data-id="${l.id}">Editar</button>
           <button class="sv-btn sv-btn-small sv-btn-danger delete-letter-btn" data-id="${l.id}">Borrar</button>
@@ -547,6 +546,18 @@ async function loadLetters() {
     list.querySelectorAll('.delete-letter-btn').forEach(b => b.addEventListener('click', () => {
       (requireAuth(() => deleteLetter(b.dataset.id)))()
     }))
+    list.querySelectorAll('.letter-attachment-img-clickable').forEach(img => {
+      img.addEventListener('click', () => {
+        openPhotoModal({
+          id: null,
+          image_url: img.dataset.url,
+          title: img.dataset.title,
+          description: '',
+          created_at: null,
+          favorite: false
+        })
+      })
+    })
   } catch (e) { c.innerHTML = `<p class="error-msg">Error: ${e.message}</p>` }
 }
 
