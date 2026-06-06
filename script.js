@@ -602,38 +602,4 @@ async function init() {
   loadGallery()
 }
 
-// ============================================================
-// SEASONS
-// ============================================================
-const SEASONS = [
-  { key: 'primavera', icon: '🌸', label: 'Primavera' },
-  { key: 'verano',    icon: '☀️',  label: 'Verano' },
-  { key: 'otonio',    icon: '🍂', label: 'Otonio' },
-  { key: 'invierno',  icon: '❄️', label: 'Invierno' },
-]
-
-let currentSeasonIdx = 0
-
-function getSavedSeason() {
-  const saved = localStorage.getItem('season')
-  if (!saved) return 0
-  const idx = SEASONS.findIndex(s => s.key === saved)
-  return idx >= 0 ? idx : 0
-}
-
-function applySeason(idx) {
-  currentSeasonIdx = idx
-  const season = SEASONS[idx]
-  document.documentElement.setAttribute('data-season', season.key)
-  document.getElementById('season-btn').innerHTML = season.icon
-  localStorage.setItem('season', season.key)
-}
-
-document.getElementById('season-btn').addEventListener('click', () => {
-  const next = (currentSeasonIdx + 1) % SEASONS.length
-  applySeason(next)
-})
-
-applySeason(getSavedSeason())
-
 init()
