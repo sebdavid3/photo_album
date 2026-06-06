@@ -40,6 +40,9 @@
     <button class="btn menu__tab" data-tooltip="Cofre" onclick="openTab(event,'cofre')">
       <img src="assets/bag.svg" class="menu__img" alt="cofre" />
     </button>
+    <button class="btn menu__tab" data-tooltip="Musica" onclick="openTab(event,'musica')">
+      <svg class="menu__img" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4v16a4 4 0 1 0 4 4V12l12-2v6a4 4 0 1 0 4 4V4L12 4z" fill="currentColor"/></svg>
+    </button>
     <button class="btn menu__tab" data-tooltip="Ajustes" onclick="openTab(event,'ajustes')">
       <img src="assets/console.svg" class="menu__img" alt="ajustes" />
     </button>
@@ -185,6 +188,42 @@
     <div id="ajustes" class="content" style="display: none;">
       <h2>Ajustes</h2>
       <p style="opacity:0.6;font-size:22px;">La sesion se gestiona desde los botones de accion (subir foto, crear album, etc.)</p>
+    </div>
+
+    <!-- ========== MUSICA ========== -->
+    <div id="musica" class="content" style="display: none;">
+      <div class="section-header">
+        <h2>Musica</h2>
+        <button class="sv-btn sv-btn-small" id="music-refresh-btn" onclick="loadMusic()">Recargar</button>
+      </div>
+      <div id="music-player" class="music-player">
+        <div class="music-player-header">
+          <div class="music-track-art">🎵</div>
+          <div class="music-track-info">
+            <div class="music-track-name" id="music-track-name">Sin cancion</div>
+            <div class="music-track-artist" id="music-track-artist">Agrega archivos a assets/audios/</div>
+          </div>
+        </div>
+        <div class="music-progress">
+          <span class="music-time" id="music-current-time">0:00</span>
+          <div class="music-progress-bar" id="music-progress-bar">
+            <div class="music-progress-fill" id="music-progress-fill"></div>
+          </div>
+          <span class="music-time" id="music-duration">0:00</span>
+        </div>
+        <div class="music-controls">
+          <button class="sv-btn sv-btn-small" id="music-prev-btn" title="Anterior">⏮</button>
+          <button class="sv-btn" id="music-play-btn" title="Reproducir">▶</button>
+          <button class="sv-btn sv-btn-small" id="music-next-btn" title="Siguiente">⏭</button>
+          <span class="music-volume">
+            <label for="music-volume-slider">🔊</label>
+            <input type="range" id="music-volume-slider" min="0" max="1" step="0.05" value="0.5" />
+          </span>
+        </div>
+        <div class="music-playlist" id="music-playlist">
+          <div class="loading">Buscando canciones...</div>
+        </div>
+      </div>
     </div>
 
   </div><!-- end main -->
