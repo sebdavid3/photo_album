@@ -1,5 +1,11 @@
 {
   "version": 2,
   "buildCommand": "chmod +x scripts/generate-config.sh && ./scripts/generate-config.sh",
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "crons": [
+    {
+      "path": "/api/keep-alive",
+      "schedule": "*/14 * * * *"
+    }
+  ]
 }
