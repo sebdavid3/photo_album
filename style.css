@@ -1199,27 +1199,6 @@ h3 { font-size: 26px; }
   transform: scale(1.15);
 }
 
-/*=============================================
-   MAP DECORATION
-   =============================================*/
-.map-decoration {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  width: 100px;
-  height: auto;
-  opacity: 0.15;
-  pointer-events: none;
-  image-rendering: pixelated;
-}
 
-.map-decoration img {
-  width: 100%;
-  height: auto;
-}
-
-#albumes {
-  position: relative;
-}
 
 
