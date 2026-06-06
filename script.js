@@ -639,14 +639,14 @@ async function renderPDF(containerId, url) {
     nextBtn.className = 'sv-btn sv-btn-small'
     nextBtn.textContent = '▶'
 
+    const canvas = document.createElement('canvas')
+    canvas.className = 'pdf-canvas'
+    container.appendChild(canvas)
+
     nav.appendChild(prevBtn)
     nav.appendChild(pageInfo)
     nav.appendChild(nextBtn)
     container.appendChild(nav)
-
-    const canvas = document.createElement('canvas')
-    canvas.className = 'pdf-canvas'
-    container.appendChild(canvas)
 
     let currentPage = 1
 
