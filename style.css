@@ -148,7 +148,7 @@ h3 { font-size: 26px; }
    =============================================*/
 .menu {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   height: 100%;
   display: flex;
   flex-direction: column;
