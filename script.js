@@ -498,7 +498,7 @@ async function loadLetters() {
         <div class="letter-header"><span class="letter-title">${l.title}</span><span class="letter-date">${formatDate(l.created_at)}</span></div>
         <div class="letter-content">${l.content || ''}</div>
         ${l.pdf_url ? (isImage
-          ? `<img src="${l.pdf_url}" alt="${l.pdf_name}" class="letter-attachment-img" />`
+          ? `<div class="letter-attachment-wrap"><img src="${l.pdf_url}" alt="${l.pdf_name}" class="letter-attachment-img" /></div>`
           : `<div id="${pdfId}" class="pdf-viewer" data-url="${l.pdf_url}"><div class="pdf-viewer-loading">Cargando PDF...</div></div>`
         ) : ''}
         ${l.pdf_url ? `<div style="margin-top:0.5em;"><a href="${l.pdf_url}" target="_blank" class="letter-pdf" download>📎 ${l.pdf_name || 'Descargar adjunto'}</a></div>` : ''}
