@@ -38,7 +38,9 @@
     <button class="btn menu__tab" data-tooltip="Recuerdos" onclick="openTab(event,'cartas')">
       <img src="assets/heart.svg" class="menu__img" alt="cartas" />
     </button>
-
+    <button class="krobus-btn" id="krobus-btn" title="Iniciar sesion">
+      <img src="assets/descargados/Krobus_Icon.png" alt="krobus" />
+    </button>
   </div>
 
   <!-- MAIN CONTENT -->
@@ -49,7 +51,7 @@
       <div class="section-header">
         <h2>Galeria</h2>
         <div class="section-header-btns">
-          <button class="sv-btn sv-btn-small" id="gallery-upload-btn">Subir foto</button>
+          <button class="sv-btn sv-btn-small auth-btn" id="gallery-upload-btn">Subir foto</button>
           <button class="sv-btn sv-btn-small" onclick="loadGallery()">Recargar</button>
         </div>
       </div>
@@ -64,7 +66,7 @@
       <div id="albums-list-view">
         <div class="section-header">
           <h2>Albumes</h2>
-          <button class="sv-btn sv-btn-small" id="create-album-btn">Nuevo album</button>
+          <button class="sv-btn sv-btn-small auth-btn" id="create-album-btn">Nuevo album</button>
         </div>
         <div id="albums-container">
           <div class="loading">Cargando albumes...</div>
@@ -77,8 +79,8 @@
           <button class="sv-btn sv-btn-small" id="album-back-btn">Volver</button>
           <h2 id="album-detail-title"></h2>
           <div class="section-header-btns">
-            <button class="sv-btn sv-btn-small" id="album-add-photos-btn">Agregar fotos</button>
-            <button class="sv-btn sv-btn-small sv-btn-danger" id="album-delete-btn">Borrar album</button>
+            <button class="sv-btn sv-btn-small auth-btn" id="album-add-photos-btn">Agregar fotos</button>
+            <button class="sv-btn sv-btn-small sv-btn-danger auth-btn" id="album-delete-btn">Borrar album</button>
           </div>
         </div>
         <p id="album-detail-desc" style="font-size:18px;opacity:0.7;margin-bottom:1em;"></p>
@@ -127,7 +129,7 @@
     <div id="cartas" class="content" style="display: none;">
       <div class="section-header">
         <h2>Cartas</h2>
-        <button class="sv-btn sv-btn-small" id="new-letter-btn">Nueva carta</button>
+        <button class="sv-btn sv-btn-small auth-btn" id="new-letter-btn">Nueva carta</button>
       </div>
 
       <!-- New letter form -->
@@ -221,7 +223,7 @@
     <p id="modal-desc"></p>
     <p id="modal-date" style="font-size:14px;opacity:0.6;"></p>
     <div class="modal-actions">
-      <button class="sv-btn sv-btn-small sv-btn-danger" id="modal-delete-btn">Borrar</button>
+      <button class="sv-btn sv-btn-small sv-btn-danger auth-btn" id="modal-delete-btn">Borrar</button>
     </div>
   </div>
 </div>

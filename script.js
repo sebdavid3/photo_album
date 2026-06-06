@@ -95,6 +95,14 @@ function hideLoginModal() {
   document.getElementById('login-modal').classList.add('hidden')
 }
 
+function setAuthUI(loggedIn) {
+  document.documentElement.classList.toggle('logged-in', loggedIn)
+  const krobus = document.getElementById('krobus-btn')
+  if (krobus) {
+    krobus.title = loggedIn ? 'Cerrar sesion' : 'Iniciar sesion'
+  }
+}
+
 async function handleLoginModal() {
   const pw = document.getElementById('login-modal-password').value
   const err = document.getElementById('login-modal-error')
@@ -108,11 +116,22 @@ async function handleLoginModal() {
     if (!res.ok || !data.success) { err.textContent = 'Contrasena incorrecta'; return }
     setPassword(pw)
     if (data.album_name) { document.title = data.album_name }
+    setAuthUI(true)
     hideLoginModal()
     toast('Sesion iniciada')
     if (pendingAction) { const fn = pendingAction; pendingAction = null; fn() }
   } catch (e) { err.textContent = 'Error de conexion' }
 }
+
+document.getElementById('krobus-btn').addEventListener('click', () => {
+  if (isLoggedIn()) {
+    clearPassword()
+    setAuthUI(false)
+    toast('Sesion cerrada')
+  } else {
+    showLoginModal()
+  }
+})
 
 document.getElementById('login-modal-btn').addEventListener('click', handleLoginModal)
 document.getElementById('login-modal-close').addEventListener('click', hideLoginModal)
@@ -523,8 +542,8 @@ async function loadLetters() {
           : `<div id="${pdfId}" class="pdf-viewer" data-url="${l.pdf_url}"><div class="pdf-viewer-loading">Cargando PDF...</div></div>`
         ) : ''}
         <div class="letter-actions">
-          <button class="sv-btn sv-btn-small edit-letter-btn" data-id="${l.id}">Editar</button>
-          <button class="sv-btn sv-btn-small sv-btn-danger delete-letter-btn" data-id="${l.id}">Borrar</button>
+          <button class="sv-btn sv-btn-small auth-btn edit-letter-btn" data-id="${l.id}">Editar</button>
+          <button class="sv-btn sv-btn-small sv-btn-danger auth-btn delete-letter-btn" data-id="${l.id}">Borrar</button>
         </div>`
       list.appendChild(card)
 
@@ -694,8 +713,11 @@ async function init() {
         body: JSON.stringify({ password: pw, action: 'login' })
       })
       const data = await res.json()
-      if (!data.success) clearPassword()
-      else if (data.album_name) document.title = data.album_name
+      if (!data.success) { clearPassword(); setAuthUI(false) }
+      else {
+        setAuthUI(true)
+        if (data.album_name) document.title = data.album_name
+      }
     } catch (e) { /* stay logged in optimistically */ }
   }
   loadGallery()
