@@ -9,6 +9,10 @@
 </head>
 <body>
 
+<div class="avatar-mascot" id="avatar-mascot">
+  <img src="assets/avatar.svg" alt="mascota" />
+</div>
+
 <!-- MOVING CLOUDS -->
 <div class="marquee">
   <div class="clouds"><img src="assets/clouds.webp" alt="clouds" /></div>
@@ -33,6 +37,9 @@
     <button class="btn menu__tab" data-tooltip="Cartas" onclick="openTab(event,'cartas')">
       <img src="assets/heart.svg" class="menu__img" alt="cartas" />
     </button>
+    <button class="btn menu__tab" data-tooltip="Cofre" onclick="openTab(event,'cofre')">
+      <img src="assets/bag.svg" class="menu__img" alt="cofre" />
+    </button>
     <button class="btn menu__tab" data-tooltip="Ajustes" onclick="openTab(event,'ajustes')">
       <img src="assets/console.svg" class="menu__img" alt="ajustes" />
     </button>
@@ -55,8 +62,23 @@
       </div>
     </div>
 
+    <!-- ========== COFRE ========== -->
+    <div id="cofre" class="content" style="display: none;">
+      <div class="section-header">
+        <h2>Cofre de recuerdos</h2>
+        <button class="sv-btn sv-btn-small" onclick="loadCofre()">Recargar</button>
+      </div>
+      <p style="font-size:18px;opacity:0.7;margin-bottom:1em;">Tus fotos favoritas, guardadas en el cofre.</p>
+      <div id="cofre-container">
+        <div class="loading">Abriendo el cofre...</div>
+      </div>
+    </div>
+
     <!-- ========== ALBUMES ========== -->
     <div id="albumes" class="content" style="display: none;">
+      <div class="map-decoration">
+        <img src="assets/map.svg" alt="mapa" />
+      </div>
       <!-- Lista de albumes -->
       <div id="albums-list-view">
         <div class="section-header">
@@ -87,7 +109,7 @@
       <!-- Modal: crear album -->
       <div id="album-form-modal" class="modal-overlay hidden">
         <div class="modal-content">
-          <button class="modal-close" id="album-form-close">&times;</button>
+          <button class="modal-close" id="album-form-close"><img src="assets/close.svg" class="modal-close-icon" alt="cerrar" /></button>
           <h3 id="album-form-title">Nuevo Album</h3>
           <div class="form-group">
             <label>Titulo</label>
@@ -105,7 +127,7 @@
       <!-- Modal: agregar fotos al album -->
       <div id="add-photos-modal" class="modal-overlay hidden">
         <div class="modal-content" style="max-width:800px;width:95%;">
-          <button class="modal-close" id="add-photos-close">&times;</button>
+          <button class="modal-close" id="add-photos-close"><img src="assets/close.svg" class="modal-close-icon" alt="cerrar" /></button>
           <h3>Agregar fotos al album</h3>
           <p style="font-size:16px;opacity:0.7;margin-bottom:0.5em;">Haz clic en las fotos para seleccionarlas</p>
           <div id="add-photos-grid" class="selectable-grid">
@@ -162,30 +184,7 @@
     <!-- ========== AJUSTES ========== -->
     <div id="ajustes" class="content" style="display: none;">
       <h2>Ajustes</h2>
-      <div id="settings-logged-out" class="settings-section">
-        <p style="margin-bottom:1em;">Inicia sesion para administrar el album.</p>
-        <div class="form-group">
-          <label for="settings-password">Contrasena</label>
-          <input type="password" id="settings-password" class="sv-input" placeholder="Contrasena..." />
-        </div>
-        <button class="sv-btn" id="settings-login-btn">Entrar</button>
-        <p id="settings-login-error" class="error-msg"></p>
-      </div>
-
-      <div id="settings-logged-in" class="settings-section hidden">
-        <p style="margin-bottom:1em;color:var(--success);">Autenticado</p>
-        <div class="form-group">
-          <label>Nombre del album</label>
-          <input type="text" id="settings-album-name" class="sv-input" />
-        </div>
-        <div class="form-group">
-          <label>Nueva contrasena (dejar vacio para no cambiar)</label>
-          <input type="password" id="settings-new-password" class="sv-input" placeholder="Nueva contrasena..." />
-        </div>
-        <button class="sv-btn" id="save-settings-btn">Guardar cambios</button>
-        <button class="sv-btn sv-btn-small" id="settings-logout-btn" style="margin-left:0.5em;">Salir</button>
-        <p id="settings-msg" class="success-msg"></p>
-      </div>
+      <p style="opacity:0.6;font-size:22px;">La sesion se gestiona desde los botones de accion (subir foto, crear album, etc.)</p>
     </div>
 
   </div><!-- end main -->
@@ -194,7 +193,7 @@
 <!-- LOGIN MODAL (for protected actions) -->
 <div id="login-modal" class="modal-overlay hidden">
   <div class="modal-content" style="position:relative;max-width:400px;">
-    <button class="modal-close" id="login-modal-close">&times;</button>
+    <button class="modal-close" id="login-modal-close"><img src="assets/close.svg" class="modal-close-icon" alt="cerrar" /></button>
     <h3>Inicia sesion</h3>
     <p style="font-size:18px;margin-bottom:1em;">Necesitas la contrasena para continuar.</p>
     <div class="form-group">
@@ -208,7 +207,7 @@
 <!-- UPLOAD MODAL -->
 <div id="upload-modal" class="modal-overlay hidden">
   <div class="modal-content" style="position:relative;max-width:500px;">
-    <button class="modal-close" id="upload-modal-close">&times;</button>
+    <button class="modal-close" id="upload-modal-close"><img src="assets/close.svg" class="modal-close-icon" alt="cerrar" /></button>
     <h3>Subir foto</h3>
     <div class="form-group">
       <label>Foto</label>
@@ -241,7 +240,7 @@
 <!-- PHOTO MODAL -->
 <div id="photo-modal" class="modal-overlay hidden">
   <div class="modal-content" style="position:relative;">
-    <button class="modal-close" id="modal-close">&times;</button>
+    <button class="modal-close" id="modal-close"><img src="assets/close.svg" class="modal-close-icon" alt="cerrar" /></button>
     <img id="modal-img" src="" alt="" />
     <h2 id="modal-title"></h2>
     <p id="modal-desc"></p>

@@ -132,9 +132,10 @@ function openTab(evt, tabName) {
   evt.currentTarget.className += ' menu__tab--active'
 
   if (tabName === 'galeria') loadGallery()
+  if (tabName === 'cofre') loadCofre()
   if (tabName === 'albumes') loadAlbums()
   if (tabName === 'cartas') loadLetters()
-  if (tabName === 'ajustes') loadSettingsView()
+  if (tabName === 'ajustes') { /* empty */ }
 }
 
 // ============================================================
@@ -153,6 +154,28 @@ async function loadGallery() {
       card.className = 'photo-card'
       card.style.position = 'relative'
       card.innerHTML = `<img src="${p.image_url}" alt="${p.title}" loading="lazy" />${p.favorite ? '<span class="photo-fav">⭐</span>' : ''}<div class="photo-info"><div class="photo-title">${p.title}</div><div class="photo-date">${formatDate(p.created_at)}</div></div>`
+      card.addEventListener('click', () => openPhotoModal(p))
+      grid.appendChild(card)
+    })
+  } catch (e) { c.innerHTML = `<p class="error-msg">Error: ${e.message}</p>` }
+}
+
+// ============================================================
+// COFRE (favorites only)
+// ============================================================
+async function loadCofre() {
+  const c = document.getElementById('cofre-container')
+  c.innerHTML = '<div class="loading">Abriendo el cofre...</div>'
+  try {
+    const photos = await fetchPublic('photos', q => q.eq('favorite', true).order('created_at', { ascending: false }))
+    if (!photos.length) { c.innerHTML = '<p class="no-data">El cofre esta vacio. Marca fotos como favoritas para guardarlas aqui.</p>'; return }
+    c.innerHTML = '<div class="gallery-grid"></div>'
+    const grid = c.querySelector('.gallery-grid')
+    photos.forEach(p => {
+      const card = document.createElement('div')
+      card.className = 'photo-card'
+      card.style.position = 'relative'
+      card.innerHTML = `<img src="${p.image_url}" alt="${p.title}" loading="lazy" /><span class="photo-fav">⭐</span><div class="photo-info"><div class="photo-title">${p.title}</div><div class="photo-date">${formatDate(p.created_at)}</div></div>`
       card.addEventListener('click', () => openPhotoModal(p))
       grid.appendChild(card)
     })
@@ -585,79 +608,7 @@ async function renderPDF(containerId, url) {
   }
 }
 
-// ============================================================
-// SETTINGS
-// ============================================================
-function loadSettingsView() {
-  if (isLoggedIn()) showSettingsLoggedIn()
-  else showSettingsLoggedOut()
-}
 
-function showSettingsLoggedOut() {
-  document.getElementById('settings-logged-out').classList.remove('hidden')
-  document.getElementById('settings-logged-in').classList.add('hidden')
-  document.getElementById('settings-password').value = ''
-  document.getElementById('settings-login-error').textContent = ''
-}
-
-function showSettingsLoggedIn() {
-  document.getElementById('settings-logged-out').classList.add('hidden')
-  document.getElementById('settings-logged-in').classList.remove('hidden')
-  document.getElementById('settings-album-name').value = ''
-  document.getElementById('settings-new-password').value = ''
-  document.getElementById('settings-msg').textContent = ''
-  loadSettingsData()
-}
-
-async function loadSettingsData() {
-  try {
-    const r = await api('get_settings')
-    if (r.settings?.album_name) document.getElementById('settings-album-name').value = r.settings.album_name
-  } catch (e) { /* ignore */ }
-}
-
-document.getElementById('settings-login-btn').addEventListener('click', async () => {
-  const pw = document.getElementById('settings-password').value
-  const err = document.getElementById('settings-login-error')
-  if (!pw) { err.textContent = 'Ingresa la contrasena'; return }
-  try {
-    const res = await fetch(API_URL, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pw, action: 'login' })
-    })
-    const data = await res.json()
-    if (!res.ok || !data.success) { err.textContent = 'Contrasena incorrecta'; return }
-    setPassword(pw)
-    if (data.album_name) { document.title = data.album_name }
-    showSettingsLoggedIn()
-  } catch (e) { err.textContent = 'Error de conexion' }
-})
-
-document.getElementById('settings-password').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('settings-login-btn').click()
-})
-
-document.getElementById('save-settings-btn').addEventListener('click', async () => {
-  const name = document.getElementById('settings-album-name').value.trim()
-  const pass = document.getElementById('settings-new-password').value.trim()
-  const msg = document.getElementById('settings-msg')
-  try {
-    const d = {}
-    if (name) d.album_name = name
-    if (pass) d.new_password = pass
-    if (!Object.keys(d).length) { msg.textContent = 'Sin cambios'; msg.className = 'error-msg'; return }
-    await api('update_settings', d)
-    if (pass) setPassword(pass)
-    if (name) document.title = name
-    document.getElementById('settings-new-password').value = ''
-    msg.textContent = 'Guardado'; msg.className = 'success-msg'
-    setTimeout(() => msg.textContent = '', 3000)
-  } catch (e) { msg.textContent = e.message; msg.className = 'error-msg' }
-})
-
-document.getElementById('settings-logout-btn').addEventListener('click', () => {
-  clearPassword(); showSettingsLoggedOut(); toast('Sesion cerrada')
-})
 
 // ============================================================
 // INIT
