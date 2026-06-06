@@ -132,7 +132,6 @@ function openTab(evt, tabName) {
   evt.currentTarget.className += ' menu__tab--active'
 
   if (tabName === 'galeria') loadGallery()
-  if (tabName === 'cofre') loadCofre()
   if (tabName === 'albumes') loadAlbums()
   if (tabName === 'cartas') loadLetters()
   if (tabName === 'ajustes') { /* empty */ }
@@ -154,28 +153,6 @@ async function loadGallery() {
       card.className = 'photo-card'
       card.style.position = 'relative'
       card.innerHTML = `<img src="${p.image_url}" alt="${p.title}" loading="lazy" />${p.favorite ? '<span class="photo-fav">⭐</span>' : ''}<div class="photo-info"><div class="photo-title">${p.title}</div><div class="photo-date">${formatDate(p.created_at)}</div></div>`
-      card.addEventListener('click', () => openPhotoModal(p))
-      grid.appendChild(card)
-    })
-  } catch (e) { c.innerHTML = `<p class="error-msg">Error: ${e.message}</p>` }
-}
-
-// ============================================================
-// COFRE (favorites only)
-// ============================================================
-async function loadCofre() {
-  const c = document.getElementById('cofre-container')
-  c.innerHTML = '<div class="loading">Abriendo el cofre...</div>'
-  try {
-    const photos = await fetchPublic('photos', q => q.eq('favorite', true).order('created_at', { ascending: false }))
-    if (!photos.length) { c.innerHTML = '<p class="no-data">El cofre esta vacio. Marca fotos como favoritas para guardarlas aqui.</p>'; return }
-    c.innerHTML = '<div class="gallery-grid"></div>'
-    const grid = c.querySelector('.gallery-grid')
-    photos.forEach(p => {
-      const card = document.createElement('div')
-      card.className = 'photo-card'
-      card.style.position = 'relative'
-      card.innerHTML = `<img src="${p.image_url}" alt="${p.title}" loading="lazy" /><span class="photo-fav">⭐</span><div class="photo-info"><div class="photo-title">${p.title}</div><div class="photo-date">${formatDate(p.created_at)}</div></div>`
       card.addEventListener('click', () => openPhotoModal(p))
       grid.appendChild(card)
     })
