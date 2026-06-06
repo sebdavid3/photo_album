@@ -134,7 +134,7 @@ function openTab(evt, tabName) {
   if (tabName === 'galeria') loadGallery()
   if (tabName === 'albumes') loadAlbums()
   if (tabName === 'cartas') loadLetters()
-  if (tabName === 'ajustes') { /* empty */ }
+
 }
 
 // ============================================================
