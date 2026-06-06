@@ -174,13 +174,48 @@ serve(async (req: Request) => {
           .single()
         if (fetchError) throw fetchError
 
+        const newFav = !photo.favorite
+
         const { data, error } = await supabase
           .from('photos')
-          .update({ favorite: !photo.favorite, updated_at: new Date().toISOString() })
+          .update({ favorite: newFav, updated_at: new Date().toISOString() })
           .eq('id', body.id)
           .select()
           .single()
         if (error) throw error
+
+        // Auto-manage "Favoritos" album
+        const { data: favAlbum } = await supabase
+          .from('albums')
+          .select('id')
+          .eq('title', 'Favoritos')
+          .maybeSingle()
+
+        let favAlbumId = favAlbum?.id
+
+        if (!favAlbumId) {
+          const { data: newAlbum, error: createError } = await supabase
+            .from('albums')
+            .insert({ title: 'Favoritos', description: 'Tus fotos favoritas' })
+            .select('id')
+            .single()
+          if (!createError) favAlbumId = newAlbum.id
+        }
+
+        if (favAlbumId) {
+          if (newFav) {
+            await supabase
+              .from('album_photos')
+              .upsert({ album_id: favAlbumId, photo_id: body.id }, { onConflict: 'album_id,photo_id' })
+          } else {
+            await supabase
+              .from('album_photos')
+              .delete()
+              .eq('album_id', favAlbumId)
+              .eq('photo_id', body.id)
+          }
+        }
+
         result = { photo: data }
         break
       }
