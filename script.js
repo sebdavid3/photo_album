@@ -186,8 +186,10 @@ async function loadCofre() {
 // CAT MUSIC (background player)
 // ============================================================
 const musicFiles = [
-  // Agrega aqui los nombres de tus archivos de audio en assets/audio/
-  // Ejemplo: { file: 'Stardew Valley OST - Pelican Town.mp3', name: 'Pelican Town', artist: 'ConcernedApe' },
+  { file: 'Stardew Valley OST - Stardew Valley Overture.mp3', name: 'Stardew Valley Overture', artist: 'ConcernedApe' },
+  { file: 'Stardew Valley OST - Pelican Town.mp3', name: 'Pelican Town', artist: 'ConcernedApe' },
+  { file: 'Stardew Valley OST - Grandpa\'s Theme.mp3', name: "Grandpa's Theme", artist: 'ConcernedApe' },
+  { file: 'Stardew Valley OST - Cloud Country.mp3', name: 'Cloud Country', artist: 'ConcernedApe' },
 ]
 
 let bgAudio = null
