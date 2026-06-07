@@ -1119,8 +1119,8 @@ html.logged-in .photo-fav-btn {
     border-width: 18px;
     width: 62px;
     height: 64px;
-    justify-content: flex-end;
-    padding: 0 4px;
+    justify-content: center;
+    padding: 0;
   }
 
   .menu__tabs__container .menu__tab--active {
