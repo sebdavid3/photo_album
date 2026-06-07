@@ -183,6 +183,13 @@ h3 { font-size: 26px; }
   height: 72px;
 }
 
+.menu__tabs__container .menu__tab.auth-btn {
+  display: none;
+}
+html.logged-in .menu__tabs__container .menu__tab.auth-btn {
+  display: flex;
+}
+
 .menu__tabs__container .menu__tab .menu__img {
   height: 48px;
 }
