@@ -1100,37 +1100,37 @@ html.logged-in .photo-fav-btn {
 
   .menu {
     flex-direction: row;
-    gap: 0.4em;
+    gap: 0;
   }
 
   .menu__tabs__container {
-    margin-top: 28px;
-    width: 60px;
-    min-width: 60px;
+    margin-top: 32px;
+    width: auto;
+    min-width: unset;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-end;
     padding-left: unset;
     overflow: visible;
-    gap: 4px;
+    gap: 0;
   }
 
   .menu__tabs__container .menu__tab {
     border-image-source: url("assets/tab_border_side.png");
-    border-width: 14px;
-    width: 52px;
-    height: 56px;
-    justify-content: center;
-    padding: 0;
+    border-width: 18px;
+    width: 62px;
+    height: 64px;
+    justify-content: flex-end;
+    padding: 0 4px;
   }
 
   .menu__tabs__container .menu__tab--active {
-    width: 44px;
-    height: 48px;
+    width: 48px;
+    height: 52px;
   }
 
   .menu__tabs__container .menu__tab .menu__img {
-    height: 24px;
-    width: 24px;
+    height: 28px;
+    width: 28px;
   }
 
   .main {
@@ -1330,30 +1330,30 @@ html.logged-in .photo-fav-btn {
   }
 
   .menu {
-    gap: 0.2em;
+    gap: 0;
   }
 
   .menu__tabs__container {
-    width: 48px;
-    min-width: 48px;
+    width: auto;
+    min-width: unset;
     margin-top: 24px;
-    gap: 2px;
+    gap: 0;
   }
 
   .menu__tabs__container .menu__tab {
-    width: 42px;
-    height: 46px;
-    border-width: 10px;
+    width: 48px;
+    height: 50px;
+    border-width: 14px;
   }
 
   .menu__tabs__container .menu__tab--active {
-    width: 36px;
-    height: 40px;
+    width: 38px;
+    height: 42px;
   }
 
   .menu__tabs__container .menu__tab .menu__img {
-    height: 20px;
-    width: 20px;
+    height: 22px;
+    width: 22px;
   }
 
   .main {
