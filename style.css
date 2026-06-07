@@ -498,12 +498,31 @@ html.logged-in .auth-btn.sv-btn {
   opacity: 0.6;
 }
 
-.photo-card .photo-fav {
+.photo-fav-btn {
+  display: none;
+}
+html.logged-in .photo-fav-btn {
+  display: block;
+}
+.photo-card .photo-fav-btn {
   position: absolute;
   top: 8px;
   right: 8px;
-  font-size: 20px;
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: url("assets/cursor.webp"), pointer;
   filter: drop-shadow(1px 1px rgba(0,0,0,0.5));
+  transition: transform 0.15s;
+  padding: 4px;
+  line-height: 1;
+  z-index: 2;
+}
+.photo-card .photo-fav-btn:hover {
+  transform: scale(1.2);
+}
+.photo-card .photo-fav-btn.is-fav {
+  filter: drop-shadow(0 0 6px rgba(255, 50, 50, 0.6));
 }
 
 /*=============================================

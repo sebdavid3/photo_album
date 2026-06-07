@@ -40,7 +40,7 @@
     <button class="btn menu__tab" data-tooltip="Albumes" onclick="openTab(event,'albumes')">
       <img src="assets/descargados/32px-Junimo_Icon.png" class="menu__img" alt="albumes" />
     </button>
-    <button class="btn menu__tab" data-tooltip="Recuerdos" onclick="openTab(event,'cartas')">
+    <button class="btn menu__tab auth-btn" data-tooltip="Recuerdos" onclick="openTab(event,'cartas')">
       <img src="assets/heart.svg" class="menu__img" alt="cartas" />
     </button>
   </div>
@@ -224,6 +224,7 @@
     <p id="modal-desc"></p>
     <p id="modal-date" style="font-size:14px;opacity:0.6;"></p>
     <div class="modal-actions">
+      <button class="sv-btn sv-btn-small auth-btn" id="modal-fav-btn">☆ Agregar favorito</button>
       <button class="sv-btn sv-btn-small sv-btn-danger auth-btn" id="modal-delete-btn">Borrar</button>
     </div>
   </div>

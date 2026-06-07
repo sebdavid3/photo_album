@@ -171,7 +171,11 @@ async function loadGallery() {
       const card = document.createElement('div')
       card.className = 'photo-card'
       card.style.position = 'relative'
-      card.innerHTML = `<img src="${p.image_url}" alt="${p.title}" loading="lazy" /><div class="photo-info"><div class="photo-title">${p.title}</div><div class="photo-date">${formatDate(p.created_at)}</div></div>`
+      card.innerHTML = `<img src="${p.image_url}" alt="${p.title}" loading="lazy" /><div class="photo-info"><div class="photo-title">${p.title}</div><div class="photo-date">${formatDate(p.created_at)}</div></div><button class="photo-fav-btn ${p.favorite ? 'is-fav' : ''}" data-id="${p.id}" title="${p.favorite ? 'Quitar favorito' : 'Agregar a favoritos'}">${p.favorite ? '⭐' : '☆'}</button>`
+      card.querySelector('.photo-fav-btn').addEventListener('click', e => {
+        e.stopPropagation()
+        requireAuth(() => toggleFavorite(p.id, card))()
+      })
       card.addEventListener('click', () => openPhotoModal(p))
       grid.appendChild(card)
     })
@@ -332,6 +336,24 @@ function openPhotoModal(photo) {
   document.getElementById('modal-desc').textContent = photo.description || ''
   document.getElementById('modal-date').textContent = formatDate(photo.created_at)
   document.getElementById('modal-delete-btn').onclick = requireAuth(() => deletePhoto(photo.id))
+  const favBtn = document.getElementById('modal-fav-btn')
+  const isFav = photo.favorite
+  favBtn.classList.toggle('is-fav', isFav)
+  favBtn.innerHTML = isFav ? '⭐ Quitar favorito' : '☆ Agregar favorito'
+  favBtn.onclick = requireAuth(async () => {
+    const result = await api('toggle_favorite', { id: photo.id })
+    const newFav = result.photo.favorite
+    photo.favorite = newFav
+    favBtn.classList.toggle('is-fav', newFav)
+    favBtn.innerHTML = newFav ? '⭐ Quitar favorito' : '☆ Agregar favorito'
+    const cardBtn = document.querySelector(`.photo-fav-btn[data-id="${photo.id}"]`)
+    if (cardBtn) {
+      cardBtn.classList.toggle('is-fav', newFav)
+      cardBtn.innerHTML = newFav ? '⭐' : '☆'
+      cardBtn.title = newFav ? 'Quitar favorito' : 'Agregar a favoritos'
+    }
+    toast(newFav ? 'Agregado a favoritos' : 'Quitado de favoritos')
+  })
   document.getElementById('photo-modal').classList.remove('hidden')
 }
 
@@ -344,6 +366,24 @@ async function deletePhoto(id) {
   if (!confirm('Borrar este recuerdo?')) return
   await api('delete_photo', { id })
   toast('Borrado'); closePhotoModal(); loadGallery()
+}
+
+async function toggleFavorite(id, cardEl) {
+  const result = await api('toggle_favorite', { id })
+  const isFav = result.photo.favorite
+  const btn = cardEl ? cardEl.querySelector('.photo-fav-btn') : document.querySelector(`.photo-fav-btn[data-id="${id}"]`)
+  if (btn) {
+    btn.classList.toggle('is-fav', isFav)
+    btn.innerHTML = isFav ? '⭐' : '☆'
+    btn.title = isFav ? 'Quitar favorito' : 'Agregar a favoritos'
+  }
+  const modalBtn = document.getElementById('modal-fav-btn')
+  if (modalBtn) {
+    modalBtn.classList.toggle('is-fav', isFav)
+    modalBtn.innerHTML = isFav ? '⭐ Quitar favorito' : '☆ Agregar favorito'
+  }
+  toast(isFav ? 'Agregado a favoritos' : 'Quitado de favoritos')
+  if (!cardEl) loadGallery()
 }
 
 // ============================================================
