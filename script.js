@@ -150,6 +150,9 @@ function openTab(evt, tabName) {
   for (let i = 0; i < tabs.length; i++) tabs[i].className = tabs[i].className.replace(' menu__tab--active', '')
   evt.currentTarget.className += ' menu__tab--active'
 
+  // Scroll al inicio al cambiar de pestaña
+  document.querySelector('.main').scrollTop = 0
+
   if (tabName === 'galeria') loadGallery()
   if (tabName === 'albumes') loadAlbums()
   if (tabName === 'cartas') loadLetters()
@@ -560,6 +563,19 @@ document.getElementById('letter-pdf-file').addEventListener('change', function()
   document.getElementById('letter-pdf-name').textContent = this.files[0] ? this.files[0].name : ''
 })
 
+function getYouTubeEmbedUrl(url) {
+  if (!url) return null
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})(?:[&?]\S*)?$/,
+    /^([a-zA-Z0-9_-]{11})$/
+  ]
+  for (const p of patterns) {
+    const m = url.trim().match(p)
+    if (m) return `https://www.youtube.com/embed/${m[1]}`
+  }
+  return null
+}
+
 async function loadLetters() {
   const c = document.getElementById('letters-container')
   c.innerHTML = '<div class="loading">Cargando cartas...</div>'
@@ -572,15 +588,16 @@ async function loadLetters() {
       const card = document.createElement('div')
       card.className = 'letter-card'
       const isImage = l.pdf_url && l.pdf_name && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(l.pdf_name)
-      const pdfId = `pdf-${l.id}`
 
+      const videoEmbedUrl = getYouTubeEmbedUrl(l.video_url)
       card.innerHTML = `
         <div class="letter-header"><span class="letter-title">${l.title}</span><span class="letter-date">${formatDate(l.created_at)}</span></div>
         <div class="letter-content">${l.content || ''}</div>
         ${l.pdf_url ? (isImage
           ? `<div class="letter-attachment-wrap"><img src="${l.pdf_url}" alt="${l.pdf_name}" class="letter-attachment-img letter-attachment-img-clickable" data-url="${l.pdf_url}" data-title="${l.title}" /></div>`
-          : `<div id="${pdfId}" class="pdf-viewer" data-url="${l.pdf_url}"><div class="pdf-viewer-loading">Cargando PDF...</div></div>`
+          : `<div class="letter-pdf-preview" data-url="${l.pdf_url}"><div class="pdf-viewer-loading">Cargando PDF...</div></div>`
         ) : ''}
+        ${videoEmbedUrl ? `<div class="letter-video-wrap"><iframe src="${videoEmbedUrl}" frameborder="0" allowfullscreen></iframe></div>` : ''}
         <div class="letter-actions">
           <button class="sv-btn sv-btn-small auth-btn edit-letter-btn" data-id="${l.id}">Editar</button>
           <button class="sv-btn sv-btn-small sv-btn-danger auth-btn delete-letter-btn" data-id="${l.id}">Borrar</button>
@@ -588,7 +605,7 @@ async function loadLetters() {
       list.appendChild(card)
 
       if (l.pdf_url && !isImage) {
-        renderPDF(pdfId, l.pdf_url)
+        renderPDFPreview(card.querySelector('.letter-pdf-preview'), l.pdf_url)
       }
     })
     list.querySelectorAll('.edit-letter-btn').forEach(b => b.addEventListener('click', () => {
@@ -609,6 +626,7 @@ async function loadLetters() {
         })
       })
     })
+
   } catch (e) { c.innerHTML = `<p class="error-msg">Error: ${e.message}</p>` }
 }
 
@@ -625,6 +643,7 @@ function hideLetterForm() {
   document.getElementById('letter-form').classList.add('hidden')
   document.getElementById('letter-title').value = ''
   document.getElementById('letter-content').value = ''
+  document.getElementById('letter-video-url').value = ''
   document.getElementById('letter-pdf-file').value = ''
   document.getElementById('letter-pdf-name').textContent = ''
   document.getElementById('letter-error').textContent = ''
@@ -638,16 +657,24 @@ async function editLetter(id) {
   editingLetterId = id
   document.getElementById('letter-title').value = l.title
   document.getElementById('letter-content').value = l.content || ''
+  document.getElementById('letter-video-url').value = l.video_url || ''
   showLetterForm(true)
 }
 
 document.getElementById('save-letter-btn').addEventListener('click', async () => {
   const title = document.getElementById('letter-title').value.trim()
   const content = document.getElementById('letter-content').value.trim()
+  const videoUrl = document.getElementById('letter-video-url').value.trim()
   const pdfInput = document.getElementById('letter-pdf-file')
   const errEl = document.getElementById('letter-error')
   errEl.textContent = ''
   if (!title) { errEl.textContent = 'Escribe un titulo'; return }
+
+  // Validate video URL if provided
+  if (videoUrl && !getYouTubeEmbedUrl(videoUrl)) {
+    errEl.textContent = 'Link de YouTube invalido. Usa youtube.com/watch?v=... o youtu.be/...'
+    return
+  }
 
   try {
     let pdfUrl = null, pdfName = null
@@ -659,10 +686,12 @@ document.getElementById('save-letter-btn').addEventListener('click', async () =>
       const { data: urlData } = sbClient.storage.from('letters').getPublicUrl(fn)
       pdfUrl = urlData.publicUrl; pdfName = file.name
     }
+    const payload = { title, content, video_url: videoUrl || null }
+    if (pdfUrl) { payload.pdf_url = pdfUrl; payload.pdf_name = pdfName }
     if (editingLetterId) {
-      await api('update_letter', { id: editingLetterId, title, content, ...(pdfUrl ? { pdf_url: pdfUrl, pdf_name: pdfName } : {}) })
+      await api('update_letter', { id: editingLetterId, ...payload })
     } else {
-      await api('create_letter', { title, content, pdf_url: pdfUrl, pdf_name: pdfName })
+      await api('create_letter', payload)
     }
     toast(editingLetterId ? 'Carta actualizada' : 'Carta guardada')
     hideLetterForm(); loadLetters()
@@ -678,7 +707,7 @@ async function deleteLetter(id) {
 // ============================================================
 // PDF RENDERER (custom, styled)
 // ============================================================
-async function renderPDF(containerId, url) {
+async function renderPDF(containerId, url, maxHeight) {
   const container = document.getElementById(containerId)
   if (!container) return
 
@@ -714,7 +743,12 @@ async function renderPDF(containerId, url) {
 
     async function renderPage(pageNum) {
       const page = await pdf.getPage(pageNum)
-      const vp = page.getViewport({ scale: 1.5 })
+      const baseVp = page.getViewport({ scale: 1 })
+      let scale = 1.5
+      if (maxHeight) {
+        scale = Math.min(maxHeight / baseVp.height, 1.5)
+      }
+      const vp = page.getViewport({ scale })
       canvas.width = vp.width
       canvas.height = vp.height
       const ctx = canvas.getContext('2d')
@@ -723,6 +757,8 @@ async function renderPDF(containerId, url) {
       prevBtn.disabled = pageNum <= 1
       nextBtn.disabled = pageNum >= pdf.numPages
       currentPage = pageNum
+      // Scroll al inicio del modal al cambiar de pagina
+      container.scrollIntoView(true)
     }
 
     prevBtn.addEventListener('click', () => {
@@ -739,7 +775,69 @@ async function renderPDF(containerId, url) {
   }
 }
 
+// ============================================================
+// PDF THUMBNAIL PREVIEW
+// ============================================================
+async function renderPDFPreview(container, url) {
+  if (!container) return
+  try {
+    const pdf = await pdfjsLib.getDocument(url).promise
+    const page = await pdf.getPage(1)
 
+    // Scale to fill container width for readable preview
+    const maxWidth = container.offsetWidth || 380
+    const vp = page.getViewport({ scale: 1 })
+    const scale = maxWidth / vp.width
+    const scaledVp = page.getViewport({ scale })
+
+    const canvas = document.createElement('canvas')
+    canvas.width = scaledVp.width
+    canvas.height = scaledVp.height
+    canvas.style.width = '100%'
+    canvas.style.height = 'auto'
+
+    const ctx = canvas.getContext('2d')
+    await page.render({ canvasContext: ctx, viewport: scaledVp }).promise
+
+    container.innerHTML = ''
+    container.appendChild(canvas)
+
+    // Click opens the full PDF modal
+    container.addEventListener('click', () => {
+      openPDFModal(url)
+    })
+  } catch (e) {
+    container.innerHTML = `<span style="font-size:14px;opacity:0.6;">PDF: error al cargar</span>`
+    console.error('PDF preview error:', e)
+  }
+}
+
+// ============================================================
+// PDF MODAL
+// ============================================================
+function openPDFModal(url) {
+  const modal = document.getElementById('pdf-modal')
+  const container = document.getElementById('pdf-modal-container')
+  container.innerHTML = '<div class="pdf-viewer-loading">Cargando PDF...</div>'
+  modal.classList.remove('hidden')
+  setTimeout(() => {
+    const pdfId = 'pdf-modal-render'
+    container.innerHTML = `<div id="${pdfId}" class="pdf-viewer"></div>`
+    // Use ~65% of viewport height for PDF canvas (leaves room for borders, padding, title, nav)
+    const maxHeight = window.innerHeight * 2
+    renderPDF(pdfId, url, maxHeight)
+  }, 100)
+}
+
+document.getElementById('pdf-modal-close').addEventListener('click', () => {
+  document.getElementById('pdf-modal').classList.add('hidden')
+})
+
+document.getElementById('pdf-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) {
+    document.getElementById('pdf-modal').classList.add('hidden')
+  }
+})
 
 // ============================================================
 // INIT

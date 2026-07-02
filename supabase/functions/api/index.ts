@@ -263,6 +263,7 @@ serve(async (req: Request) => {
             content: body.content || '',
             pdf_url: body.pdf_url || null,
             pdf_name: body.pdf_name || null,
+            video_url: body.video_url || null,
           })
           .select()
           .single()
@@ -283,6 +284,7 @@ serve(async (req: Request) => {
         if (body.content !== undefined) updateData.content = body.content
         if (body.pdf_url !== undefined) updateData.pdf_url = body.pdf_url
         if (body.pdf_name !== undefined) updateData.pdf_name = body.pdf_name
+        if (body.video_url !== undefined) updateData.video_url = body.video_url
 
         const { data, error } = await supabase
           .from('letters')

@@ -59,6 +59,7 @@ body {
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  background-color: #331f28;
   font-family: 'Stardew Valley';
   font-size: 32px;
   -webkit-font-smoothing: antialiased;
@@ -70,7 +71,8 @@ body {
   align-items: center;
   height: 100dvh;
   width: 100dvw;
-  padding: 2em;
+  padding: 0.3em 1em;
+  overflow-x: hidden;
 }
 
 .content {
@@ -131,6 +133,8 @@ h3 { font-size: 26px; }
 .marquee {
   z-index: -10;
   position: fixed;
+  top: 0;
+  left: 0;
   opacity: 0.8;
   display: flex;
   animation: marquee 150s linear infinite running;
@@ -199,9 +203,9 @@ html.logged-in .menu__tabs__container .menu__tab.auth-btn {
    =============================================*/
 .main {
   border-image-source: url("assets/border.png");
-  padding: 1em;
+  padding: 0.6em;
   border-style: solid;
-  border-width: 20px;
+  border-width: 14px;
   border-image-slice: 24 22;
   border-image-repeat: round;
   border-radius: 20px;
@@ -457,8 +461,8 @@ html.logged-in .auth-btn.sv-btn {
    =============================================*/
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1em;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 0.75em;
   padding: 0.5em 0;
 }
 
@@ -573,18 +577,18 @@ html.logged-in .photo-fav-btn {
 .letters-list {
   display: flex;
   flex-direction: column;
-  gap: 1em;
+  gap: 0.6em;
 }
 
 .letter-card {
   border-image-source: url("assets/tooltip_border.png");
   border-style: solid;
-  border-width: 14px;
+  border-width: 10px;
   border-image-slice: 24 22;
   border-image-repeat: round;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.15);
-  padding: 1em;
+  padding: 0.6em;
 }
 
 .letter-header {
@@ -592,25 +596,25 @@ html.logged-in .photo-fav-btn {
   justify-content: space-between;
   align-items: flex-start;
   flex-wrap: wrap;
-  gap: 0.5em;
-  margin-bottom: 0.8em;
+  gap: 0.3em;
+  margin-bottom: 0.4em;
 }
 
 .letter-title {
   font-family: SVBoldHu;
-  font-size: 24px;
+  font-size: 20px;
 }
 
 .letter-date {
-  font-size: 16px;
+  font-size: 14px;
   opacity: 0.6;
 }
 
 .letter-content {
-  font-size: 20px;
-  line-height: 1.6;
+  font-size: 17px;
+  line-height: 1.5;
   white-space: pre-wrap;
-  margin-bottom: 0.8em;
+  margin-bottom: 0.4em;
 }
 
 .letter-pdf {
@@ -624,9 +628,9 @@ html.logged-in .photo-fav-btn {
 }
 
 .letter-actions {
-  margin-top: 0.8em;
+  margin-top: 0.4em;
   display: flex;
-  gap: 0.5em;
+  gap: 0.4em;
   flex-wrap: wrap;
 }
 
@@ -802,8 +806,8 @@ html.logged-in .photo-fav-btn {
    =============================================*/
 .albums-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1em;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75em;
   padding: 0.5em 0;
 }
 
@@ -997,6 +1001,37 @@ html.logged-in .photo-fav-btn {
   overflow: hidden;
 }
 
+/* PDF preview thumbnail */
+.letter-pdf-preview {
+  margin: 0.5em 0;
+  max-height: 280px;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 2px solid var(--container_color3);
+  cursor: pointer;
+  position: relative;
+  background: rgba(0, 0, 0, 0.05);
+  transition: filter 0.15s;
+}
+.letter-pdf-preview:hover {
+  filter: brightness(1.05);
+}
+.letter-pdf-preview canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.letter-pdf-preview::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(transparent, rgba(255,200,120,0.85));
+  pointer-events: none;
+}
+
 .pdf-viewer-loading {
   text-align: center;
   padding: 2em;
@@ -1052,6 +1087,30 @@ html.logged-in .photo-fav-btn {
 }
 
 /*=============================================
+   YOUTUBE VIDEO EMBED (CARTAS)
+   =============================================*/
+.letter-video-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  margin: 0.4em auto;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 3px solid var(--container_color3);
+  background: #000;
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.letter-video-wrap iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/*=============================================
    KROBUS AUTH BUTTON
    =============================================*/
 .krobus-btn {
@@ -1088,7 +1147,7 @@ html.logged-in .photo-fav-btn {
    =============================================*/
 @media (max-width: 900px) {
   body {
-    padding: 0.8em;
+    padding: 0.6em;
   }
 
   h1 {
@@ -1136,8 +1195,8 @@ html.logged-in .photo-fav-btn {
   .main {
     height: 100%;
     overflow: auto;
-    padding: 0.6em;
-    border-width: 14px;
+    padding: 0.5em;
+    border-width: 12px;
   }
 
   [data-tooltip]:before {
@@ -1158,8 +1217,8 @@ html.logged-in .photo-fav-btn {
   }
 
   .gallery-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 0.6em;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.5em;
   }
 
   .photo-card {
@@ -1326,7 +1385,7 @@ html.logged-in .photo-fav-btn {
 
 @media (max-width: 500px) {
   body {
-    padding: 0.4em;
+    padding: 0.3em;
   }
 
   .menu {
@@ -1357,13 +1416,13 @@ html.logged-in .photo-fav-btn {
   }
 
   .main {
-    padding: 0.4em;
-    border-width: 10px;
+    padding: 0.3em;
+    border-width: 8px;
   }
 
   .gallery-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 0.4em;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.3em;
   }
 
   .photo-card {
@@ -1460,7 +1519,7 @@ html.logged-in .photo-fav-btn {
 .avatar-mascot {
   position: fixed;
   bottom: 20px;
-  left: 20px;
+  left: 10px;
   z-index: 50;
   width: 72px;
   height: 72px;
