@@ -560,6 +560,19 @@ document.getElementById('letter-pdf-file').addEventListener('change', function()
   document.getElementById('letter-pdf-name').textContent = this.files[0] ? this.files[0].name : ''
 })
 
+function getYouTubeEmbedUrl(url) {
+  if (!url) return null
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})(?:[&?]\S*)?$/,
+    /^([a-zA-Z0-9_-]{11})$/
+  ]
+  for (const p of patterns) {
+    const m = url.trim().match(p)
+    if (m) return `https://www.youtube.com/embed/${m[1]}`
+  }
+  return null
+}
+
 async function loadLetters() {
   const c = document.getElementById('letters-container')
   c.innerHTML = '<div class="loading">Cargando cartas...</div>'
@@ -574,6 +587,7 @@ async function loadLetters() {
       const isImage = l.pdf_url && l.pdf_name && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(l.pdf_name)
       const pdfId = `pdf-${l.id}`
 
+      const videoEmbedUrl = getYouTubeEmbedUrl(l.video_url)
       card.innerHTML = `
         <div class="letter-header"><span class="letter-title">${l.title}</span><span class="letter-date">${formatDate(l.created_at)}</span></div>
         <div class="letter-content">${l.content || ''}</div>
@@ -581,6 +595,7 @@ async function loadLetters() {
           ? `<div class="letter-attachment-wrap"><img src="${l.pdf_url}" alt="${l.pdf_name}" class="letter-attachment-img letter-attachment-img-clickable" data-url="${l.pdf_url}" data-title="${l.title}" /></div>`
           : `<div id="${pdfId}" class="pdf-viewer" data-url="${l.pdf_url}"><div class="pdf-viewer-loading">Cargando PDF...</div></div>`
         ) : ''}
+        ${videoEmbedUrl ? `<div class="letter-video-wrap"><iframe src="${videoEmbedUrl}" frameborder="0" allowfullscreen></iframe></div>` : ''}
         <div class="letter-actions">
           <button class="sv-btn sv-btn-small auth-btn edit-letter-btn" data-id="${l.id}">Editar</button>
           <button class="sv-btn sv-btn-small sv-btn-danger auth-btn delete-letter-btn" data-id="${l.id}">Borrar</button>
@@ -625,6 +640,7 @@ function hideLetterForm() {
   document.getElementById('letter-form').classList.add('hidden')
   document.getElementById('letter-title').value = ''
   document.getElementById('letter-content').value = ''
+  document.getElementById('letter-video-url').value = ''
   document.getElementById('letter-pdf-file').value = ''
   document.getElementById('letter-pdf-name').textContent = ''
   document.getElementById('letter-error').textContent = ''
@@ -638,16 +654,24 @@ async function editLetter(id) {
   editingLetterId = id
   document.getElementById('letter-title').value = l.title
   document.getElementById('letter-content').value = l.content || ''
+  document.getElementById('letter-video-url').value = l.video_url || ''
   showLetterForm(true)
 }
 
 document.getElementById('save-letter-btn').addEventListener('click', async () => {
   const title = document.getElementById('letter-title').value.trim()
   const content = document.getElementById('letter-content').value.trim()
+  const videoUrl = document.getElementById('letter-video-url').value.trim()
   const pdfInput = document.getElementById('letter-pdf-file')
   const errEl = document.getElementById('letter-error')
   errEl.textContent = ''
   if (!title) { errEl.textContent = 'Escribe un titulo'; return }
+
+  // Validate video URL if provided
+  if (videoUrl && !getYouTubeEmbedUrl(videoUrl)) {
+    errEl.textContent = 'Link de YouTube invalido. Usa youtube.com/watch?v=... o youtu.be/...'
+    return
+  }
 
   try {
     let pdfUrl = null, pdfName = null
@@ -659,10 +683,12 @@ document.getElementById('save-letter-btn').addEventListener('click', async () =>
       const { data: urlData } = sbClient.storage.from('letters').getPublicUrl(fn)
       pdfUrl = urlData.publicUrl; pdfName = file.name
     }
+    const payload = { title, content, video_url: videoUrl || null }
+    if (pdfUrl) { payload.pdf_url = pdfUrl; payload.pdf_name = pdfName }
     if (editingLetterId) {
-      await api('update_letter', { id: editingLetterId, title, content, ...(pdfUrl ? { pdf_url: pdfUrl, pdf_name: pdfName } : {}) })
+      await api('update_letter', { id: editingLetterId, ...payload })
     } else {
-      await api('create_letter', { title, content, pdf_url: pdfUrl, pdf_name: pdfName })
+      await api('create_letter', payload)
     }
     toast(editingLetterId ? 'Carta actualizada' : 'Carta guardada')
     hideLetterForm(); loadLetters()
