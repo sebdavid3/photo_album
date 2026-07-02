@@ -150,6 +150,9 @@ function openTab(evt, tabName) {
   for (let i = 0; i < tabs.length; i++) tabs[i].className = tabs[i].className.replace(' menu__tab--active', '')
   evt.currentTarget.className += ' menu__tab--active'
 
+  // Scroll al inicio al cambiar de pestaña
+  document.querySelector('.main').scrollTop = 0
+
   if (tabName === 'galeria') loadGallery()
   if (tabName === 'albumes') loadAlbums()
   if (tabName === 'cartas') loadLetters()
@@ -585,7 +588,6 @@ async function loadLetters() {
       const card = document.createElement('div')
       card.className = 'letter-card'
       const isImage = l.pdf_url && l.pdf_name && /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(l.pdf_name)
-      const pdfId = `pdf-${l.id}`
 
       const videoEmbedUrl = getYouTubeEmbedUrl(l.video_url)
       card.innerHTML = `
@@ -593,7 +595,7 @@ async function loadLetters() {
         <div class="letter-content">${l.content || ''}</div>
         ${l.pdf_url ? (isImage
           ? `<div class="letter-attachment-wrap"><img src="${l.pdf_url}" alt="${l.pdf_name}" class="letter-attachment-img letter-attachment-img-clickable" data-url="${l.pdf_url}" data-title="${l.title}" /></div>`
-          : `<div id="${pdfId}" class="pdf-viewer" data-url="${l.pdf_url}"><div class="pdf-viewer-loading">Cargando PDF...</div></div>`
+          : `<div class="letter-pdf-preview" data-url="${l.pdf_url}"><div class="pdf-viewer-loading">Cargando PDF...</div></div>`
         ) : ''}
         ${videoEmbedUrl ? `<div class="letter-video-wrap"><iframe src="${videoEmbedUrl}" frameborder="0" allowfullscreen></iframe></div>` : ''}
         <div class="letter-actions">
@@ -603,7 +605,7 @@ async function loadLetters() {
       list.appendChild(card)
 
       if (l.pdf_url && !isImage) {
-        renderPDF(pdfId, l.pdf_url)
+        renderPDFPreview(card.querySelector('.letter-pdf-preview'), l.pdf_url)
       }
     })
     list.querySelectorAll('.edit-letter-btn').forEach(b => b.addEventListener('click', () => {
@@ -624,6 +626,7 @@ async function loadLetters() {
         })
       })
     })
+
   } catch (e) { c.innerHTML = `<p class="error-msg">Error: ${e.message}</p>` }
 }
 
@@ -704,7 +707,7 @@ async function deleteLetter(id) {
 // ============================================================
 // PDF RENDERER (custom, styled)
 // ============================================================
-async function renderPDF(containerId, url) {
+async function renderPDF(containerId, url, maxHeight) {
   const container = document.getElementById(containerId)
   if (!container) return
 
@@ -740,7 +743,12 @@ async function renderPDF(containerId, url) {
 
     async function renderPage(pageNum) {
       const page = await pdf.getPage(pageNum)
-      const vp = page.getViewport({ scale: 1.5 })
+      const baseVp = page.getViewport({ scale: 1 })
+      let scale = 1.5
+      if (maxHeight) {
+        scale = Math.min(maxHeight / baseVp.height, 1.5)
+      }
+      const vp = page.getViewport({ scale })
       canvas.width = vp.width
       canvas.height = vp.height
       const ctx = canvas.getContext('2d')
@@ -749,6 +757,8 @@ async function renderPDF(containerId, url) {
       prevBtn.disabled = pageNum <= 1
       nextBtn.disabled = pageNum >= pdf.numPages
       currentPage = pageNum
+      // Scroll al inicio del modal al cambiar de pagina
+      container.scrollIntoView(true)
     }
 
     prevBtn.addEventListener('click', () => {
@@ -765,7 +775,69 @@ async function renderPDF(containerId, url) {
   }
 }
 
+// ============================================================
+// PDF THUMBNAIL PREVIEW
+// ============================================================
+async function renderPDFPreview(container, url) {
+  if (!container) return
+  try {
+    const pdf = await pdfjsLib.getDocument(url).promise
+    const page = await pdf.getPage(1)
 
+    // Scale to fill container width for readable preview
+    const maxWidth = container.offsetWidth || 380
+    const vp = page.getViewport({ scale: 1 })
+    const scale = maxWidth / vp.width
+    const scaledVp = page.getViewport({ scale })
+
+    const canvas = document.createElement('canvas')
+    canvas.width = scaledVp.width
+    canvas.height = scaledVp.height
+    canvas.style.width = '100%'
+    canvas.style.height = 'auto'
+
+    const ctx = canvas.getContext('2d')
+    await page.render({ canvasContext: ctx, viewport: scaledVp }).promise
+
+    container.innerHTML = ''
+    container.appendChild(canvas)
+
+    // Click opens the full PDF modal
+    container.addEventListener('click', () => {
+      openPDFModal(url)
+    })
+  } catch (e) {
+    container.innerHTML = `<span style="font-size:14px;opacity:0.6;">PDF: error al cargar</span>`
+    console.error('PDF preview error:', e)
+  }
+}
+
+// ============================================================
+// PDF MODAL
+// ============================================================
+function openPDFModal(url) {
+  const modal = document.getElementById('pdf-modal')
+  const container = document.getElementById('pdf-modal-container')
+  container.innerHTML = '<div class="pdf-viewer-loading">Cargando PDF...</div>'
+  modal.classList.remove('hidden')
+  setTimeout(() => {
+    const pdfId = 'pdf-modal-render'
+    container.innerHTML = `<div id="${pdfId}" class="pdf-viewer"></div>`
+    // Use ~65% of viewport height for PDF canvas (leaves room for borders, padding, title, nav)
+    const maxHeight = window.innerHeight * 2
+    renderPDF(pdfId, url, maxHeight)
+  }, 100)
+}
+
+document.getElementById('pdf-modal-close').addEventListener('click', () => {
+  document.getElementById('pdf-modal').classList.add('hidden')
+})
+
+document.getElementById('pdf-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) {
+    document.getElementById('pdf-modal').classList.add('hidden')
+  }
+})
 
 // ============================================================
 // INIT

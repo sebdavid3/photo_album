@@ -59,6 +59,7 @@ body {
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  background-color: #331f28;
   font-family: 'Stardew Valley';
   font-size: 32px;
   -webkit-font-smoothing: antialiased;
@@ -71,6 +72,7 @@ body {
   height: 100dvh;
   width: 100dvw;
   padding: 0.3em 1em;
+  overflow-x: hidden;
 }
 
 .content {
@@ -131,6 +133,8 @@ h3 { font-size: 26px; }
 .marquee {
   z-index: -10;
   position: fixed;
+  top: 0;
+  left: 0;
   opacity: 0.8;
   display: flex;
   animation: marquee 150s linear infinite running;
@@ -995,6 +999,37 @@ html.logged-in .photo-fav-btn {
 .pdf-viewer {
   margin: 0.5em 0;
   overflow: hidden;
+}
+
+/* PDF preview thumbnail */
+.letter-pdf-preview {
+  margin: 0.5em 0;
+  max-height: 280px;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 2px solid var(--container_color3);
+  cursor: pointer;
+  position: relative;
+  background: rgba(0, 0, 0, 0.05);
+  transition: filter 0.15s;
+}
+.letter-pdf-preview:hover {
+  filter: brightness(1.05);
+}
+.letter-pdf-preview canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.letter-pdf-preview::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(transparent, rgba(255,200,120,0.85));
+  pointer-events: none;
 }
 
 .pdf-viewer-loading {
